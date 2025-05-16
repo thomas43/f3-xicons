@@ -38,9 +38,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ___
 # f3-xicons
 
+## Running: 
+`$ npm run dev`
 
 ## Debugging:
 
 Use [Prisma Studio](https://www.prisma.io/studio) (webpage for db entries): 
 
-`npx prisma studio`
+`$ npx prisma studio`

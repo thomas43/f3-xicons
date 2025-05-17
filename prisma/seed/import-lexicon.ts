@@ -4,10 +4,13 @@ const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse");
 const { PrismaClient, XiconType } = require("@prisma/client");
+import { normalizeQuotes, parseReferences } from "./utils";
 
 const prisma = new PrismaClient();
 const filePath = path.resolve(__dirname, "../../lexicon.csv");
 
+  
+// Lexicon has Title, Text
 async function importLexicon() {
   const records = [];
 
@@ -21,7 +24,7 @@ async function importLexicon() {
 
   for (const row of records) {
     const name = row["Title"]?.trim();
-    const description = row["Text"]?.trim();
+    const description = normalizeQuotes(row["Text"]?.trim() ?? "");
 
     if (!name || !description) {
       console.warn("⚠️ Skipping invalid row:", row);
@@ -44,16 +47,6 @@ async function importLexicon() {
   }
 
   await prisma.$disconnect();
-}
-
-function parseReferences(text : string): string[] {
-  const refRegex = /@([\w\s\-]+)/g;
-  const matches = [];
-  let match;
-  while ((match = refRegex.exec(text)) !== null) {
-    matches.push(match[1].trim());
-  }
-  return matches;
 }
 
 importLexicon().catch((e) => {

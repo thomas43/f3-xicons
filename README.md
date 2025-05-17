@@ -38,6 +38,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ___
 # f3-xicons
 
+## Importing both .csv's
+
+1. Importing seed data (should fix UTF-8 encoding weirdness)
+```
+$ npx ts-node prisma/seed/import-exicon.ts`
+$ npx ts-node prisma/seed/import-lexicon.ts`
+```
+
+2. Fix UTF-8 encoding (if needed)
+`$ npx ts-node prisma/seed/fix-description-encoding.ts`
+
+
+
 ## Running: 
 `$ npm run dev`
 

@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse");
 const { PrismaClient, XiconType } = require("@prisma/client");
+import { normalizeQuotes, parseReferences } from "./utils";
 
 const prisma = new PrismaClient();
 
@@ -23,7 +24,7 @@ async function importExicon() {
   // exicon.csv has Title,Tags,Text
   for (const row of records) {
     const name = row["Title"]?.trim();
-    const description = row["Text"]?.trim();
+    const description = normalizeQuotes(row["Text"]?.trim() ?? "");
 
     if (!name || !description) {
       console.warn(`Skipping incomplete row:`, row);
@@ -54,16 +55,6 @@ function parseTags(tags: string | undefined): string[] {
     .split("|")
     .map((tag) => tag.trim())
     .filter((tag) => tag.length > 0);
-}
-
-function parseReferences(text: string): string[] {
-  const refRegex = /@([\w\s\-]+)/g;
-  const matches = [];
-  let match;
-  while ((match = refRegex.exec(text)) !== null) {
-    matches.push(match[1].trim());
-  }
-  return matches;
 }
 
 importExicon().catch((e: any) => {

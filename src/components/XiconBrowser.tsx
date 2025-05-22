@@ -57,17 +57,16 @@ export default function XiconBrowser({
           <>
             <div className="flex flex-wrap gap-2 mb-2">
               {allTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`text-sm px-3 py-1 rounded-full border ${
-                    selectedTags.includes(tag)
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-gray-100 text-gray-800 border-gray-300"
-                  }`}
-                >
-                  {tag}
-                </button>
+                <span
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`tag ${
+                  selectedTags.includes(tag) ? "tag-selected" : "tag-unselected"
+                }`}
+              >
+                {tag}
+              </span>
+              
               ))}
             </div>
             <div className="text-sm text-gray-600">

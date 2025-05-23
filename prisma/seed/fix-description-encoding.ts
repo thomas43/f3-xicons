@@ -1,8 +1,6 @@
 // @ts-nocheck
 
-import { normalizeQuotes} from "./utils";
-const { PrismaClient } = require("@prisma/client");
-
+import { normalizeQuotes } from "./utils.js";
 const prisma = new PrismaClient();
 
 async function fixDescriptions() {

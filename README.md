@@ -38,24 +38,29 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ___
 # f3-xicons
 
-## Importing both .csv's
+## Prisma commands
 
 1. Importing seed data (should fix UTF-8 encoding weirdness)
-```
+```bash
 $ npx ts-node prisma/seed/import-exicon.ts`
 $ npx ts-node prisma/seed/import-lexicon.ts`
 ```
 
 2. Fix UTF-8 encoding (if needed)
-`$ npx ts-node prisma/seed/fix-description-encoding.ts`
+```bash
+$ npx ts-node prisma/seed/fix-description-encoding.ts
+```
 
+3. Delete data **no safety**
+```bash
+$ npx ts-node prisma/seed/delete-exicon.ts
+$ npx ts-node prisma/seed/delete-lexison.ts
+```
 
+4. Use [Prisma Studio](https://www.prisma.io/studio) (webpage for db entries): 
+```bash
+$ npx prisma studio
+```
 
 ## Running: 
 `$ npm run dev`
-
-## Debugging:
-
-Use [Prisma Studio](https://www.prisma.io/studio) (webpage for db entries): 
-
-`$ npx prisma studio`

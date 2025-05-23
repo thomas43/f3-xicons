@@ -62,5 +62,12 @@ $ npx ts-node prisma/seed/delete-lexison.ts
 $ npx prisma studio
 ```
 
+## Tailwind debugging
+
+1. See if it'll compile...
+```bash
+npx tailwindcss -i src/app/globals.css  -o out.css --watch
+```
+
 ## Running: 
 `$ npm run dev`

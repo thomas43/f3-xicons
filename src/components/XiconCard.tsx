@@ -2,12 +2,12 @@
 import { Xicon } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
 
-export default function XiconCard({ entry }: { entry: Xicon }) {
+export default function XiconCard({ entry, query }: { entry: Xicon, query: string }) {
   const slug = slugify(entry.name);
 
   const renderDescriptionWithLinks = (text: string) => {
     const parts = text.split(/(@[\w\s\-]+)/g);
-
+  
     return parts.map((part, i) => {
       if (part.startsWith("@")) {
         const refName = part.slice(1).trim();
@@ -16,20 +16,31 @@ export default function XiconCard({ entry }: { entry: Xicon }) {
           <a
             key={i}
             href={`#${refSlug}`}
-            className="text-blue-600 underline"
+            className="text-f3link underline"
           >
             @{refName}
           </a>
         );
       }
-      return <span key={i}>{part}</span>;
+      return <span key={i}>{highlight(part, query)}</span>;
     });
-  };
+  };  
 
   return (
     <div className="border-b pb-4" id={slug}>
-      <h2 className="text-xl font-semibold">{entry.name}</h2>
-      <p className="text-gray-700 mb-2">
+      <h2 className="xicon-heading group">
+        <a href={`#${slug}`} className="text-inherit hover:underline">
+            {highlight(entry.name, query)}
+        </a>
+        <a
+            href={`#${slug}`}
+            className="xicon-anchor group-hover:opacity-100"
+            title="Link to this entry"
+        >
+        </a>
+    </h2>
+
+      <p className="xicon-description">
         {renderDescriptionWithLinks(entry.description)}
       </p>
 
@@ -38,7 +49,7 @@ export default function XiconCard({ entry }: { entry: Xicon }) {
           {entry.tags.map((tag, i) => (
             <span
               key={i}
-              className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-md font-medium"
+              className="tag-readonly"
             >
               {tag}
             </span>
@@ -49,3 +60,20 @@ export default function XiconCard({ entry }: { entry: Xicon }) {
   );
 }
 
+function highlight(text: string, query: string) {
+    if (!query) return text;
+  
+    const regex = new RegExp(`(${query})`, 'gi');
+    const parts = text.split(regex);
+  
+    return parts.map((part, i) =>
+      regex.test(part) ? (
+        <mark key={i} className="highlight-match">
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  }
+  

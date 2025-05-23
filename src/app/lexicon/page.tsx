@@ -10,8 +10,11 @@ export default async function LexiconPage() {
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">Lexicon</h1>
-      <XiconBrowser entries={entries} enableTags={false} />
+      <h1 className="text-3xl font-bold text-f3accent mb-6">Lexicon</h1>
+      <p className="mb-6 text-gray-600">
+        A glossary of F3 terms and lingo. Click terms or search to explore.
+      </p>
+      <XiconBrowser entries={entries} enableTags={false} searchPlaceholder="Search lexicon terms..."/>
     </div>
   );
 }

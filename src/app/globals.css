@@ -9,6 +9,7 @@
     --color-f3black: #000000;
     --color-f3white: #ffffff;
     --color-f3red: #e93d3d;
+    --color-f3accent-light: #e9645a;
 
     --color-tag-bg: #cbd5e0;
     --color-tag-fg: #2d3748;
@@ -43,22 +44,51 @@
     border-color: var(--color-f3accent);
   }
 
-  .tag {
-    @apply text-sm px-3 py-1 rounded-full border transition;
+  /* Heading with anchor link */
+  .xicon-heading {
+    @apply text-xl font-semibold flex items-center gap-2 scroll-mt-20;
   }
 
+  .xicon-anchor {
+    @apply text-[color:var(--color-f3accent)] text-sm opacity-0 transition-opacity;
+  }
+
+  /* Entry description */
+  .xicon-description {
+    @apply text-gray-700 mb-2;
+  }
+
+  /* Highlight for search matches */
+  .highlight-match {
+    @apply bg-[color:var(--color-f3accent-light)] text-inherit px-[2px] rounded-sm;
+  }
+
+  /* Tag chips (read-only in cards) */
+  .tag {
+    @apply text-sm px-3 py-1 rounded-full border transition cursor-pointer;
+  }
+  
   .tag-selected {
+    @apply text-sm px-3 py-1 rounded-full border transition cursor-pointer;
     background-color: var(--color-tag-selected-bg);
     color: var(--color-tag-selected-fg);
     border-color: var(--color-tag-selected-bg);
   }
-
+  
   .tag-unselected {
+    @apply text-sm px-3 py-1 rounded-full border transition cursor-pointer;
     background-color: var(--color-tag-bg);
     color: var(--color-tag-fg);
     border-color: var(--color-tag-bg);
   }
-
-
+  
+  .tag-readonly {
+    @apply text-sm px-3 py-1 rounded-full border transition cursor-default;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-fg);
+    border-color: var(--color-tag-bg);
+  }
+  
+  
 }
 

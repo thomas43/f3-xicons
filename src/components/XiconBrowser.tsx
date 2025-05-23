@@ -4,12 +4,16 @@ import { useState } from "react";
 import XiconCard from "./XiconCard";
 import { Xicon } from "@prisma/client";
 
+
+
 export default function XiconBrowser({
     entries,
     enableTags = true,
+    searchPlaceholder = "Search..."
   }: {
     entries: Xicon[];
     enableTags?: boolean;
+    searchPlaceholder?: string
   }) {
   
   const [query, setQuery] = useState("");
@@ -47,7 +51,7 @@ export default function XiconBrowser({
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Search..."
+          placeholder={searchPlaceholder}
           className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-md"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -56,18 +60,17 @@ export default function XiconBrowser({
         {enableTags && allTags.length > 0 && (
           <>
             <div className="flex flex-wrap gap-2 mb-2">
-              {allTags.map((tag) => (
-                <span
+            {allTags.map((tag) => (
+                <button
                 key={tag}
                 onClick={() => toggleTag(tag)}
                 className={`tag ${
-                  selectedTags.includes(tag) ? "tag-selected" : "tag-unselected"
+                    selectedTags.includes(tag) ? "tag tag-selected" : "tag-unselected"
                 }`}
-              >
+            >
                 {tag}
-              </span>
-              
-              ))}
+            </button>
+            ))}
             </div>
             <div className="text-sm text-gray-600">
               Filter mode:{" "}
@@ -88,7 +91,7 @@ export default function XiconBrowser({
       <ul className="space-y-6">
         {filtered.map((entry) => (
           <li key={entry.id}>
-            <XiconCard entry={entry} />
+            <XiconCard entry={entry} query={query} />
           </li>
         ))}
       </ul>

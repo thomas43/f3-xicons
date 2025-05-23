@@ -22,6 +22,24 @@ model Xicon {
   @@unique([name,type])
 }
 
+model Submission {
+  id          String   @id @default(cuid())
+  type        XiconType
+  name        String
+  description String
+  aliases     String[] @default([])
+  tags        String[] @default([])
+  videoUrl    String?  @db.Text
+  status      SubmissionStatus  @default(pending) // or use enum: pending, approved, rejected
+  createdAt   DateTime @default(now())
+}
+
+enum SubmissionStatus {
+  pending
+  approved
+  rejected
+}
+
 enum XiconType {
   exicon
   lexicon

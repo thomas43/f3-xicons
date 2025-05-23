@@ -40,6 +40,10 @@
     background-color: var(--color-f3gray);
   }
 
+  .bg-f3accent { 
+    background-color: var(--color-f3accent);
+  }
+
   .border-f3accent {
     border-color: var(--color-f3accent);
   }

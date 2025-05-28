@@ -35,12 +35,12 @@ export default function XiconCard({
     const { name, description, videoUrl } = form;
 
     if (!name.trim() || !description.trim()) {
-      setStatusMsg("❌ Name and description are required.");
+      setStatusMsg("Name and description are required.");
       return;
     }
 
     if (videoUrl && !/^https?:\/\/.+/.test(videoUrl)) {
-      setStatusMsg("❌ Invalid video URL.");
+      setStatusMsg("Invalid video URL.");
       return;
     }
 
@@ -56,11 +56,11 @@ export default function XiconCard({
 
     try {
       await updateXicon(updated); // make sure this function exists in `@/lib/xicon`
-      setStatusMsg("✅ Saved successfully.");
+      setStatusMsg("Saved successfully.");
       setEditing(false);
     } catch (err) {
       console.error(err);
-      setStatusMsg("❌ Failed to save.");
+      setStatusMsg("Failed to save.");
     }
   };
 
@@ -89,34 +89,40 @@ export default function XiconCard({
 
       {isAdmin && editing ? (
         <div className="space-y-2">
+          <label className="text-sm text-gray-600">Name:</label>
           <input
             className="w-full border px-2 py-1 text-sm rounded"
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
+          <label className="text-sm text-gray-600">Description:</label>
           <textarea
             className="w-full border px-2 py-1 text-sm rounded"
             value={form.description}
             onChange={(e) => handleChange("description", e.target.value)}
           />
+          <label className="text-sm text-gray-600">Aliases:</label>
           <input
             className="w-full border px-2 py-1 text-sm rounded"
             placeholder="Aliases, Comma-separated"
             value={form.aliases}
             onChange={(e) => handleChange("aliases", e.target.value)}
           />
+          <label className="text-sm text-gray-600">Tags:</label>
           <input
             className="w-full border px-2 py-1 text-sm rounded"
             placeholder="Tags, Comma-separated"
             value={form.tags}
             onChange={(e) => handleChange("tags", e.target.value)}
           />
+          <label className="text-sm text-gray-600">References: </label>
           <input
             className="w-full border px-2 py-1 text-sm rounded"
             placeholder="References, Comma-separated"
             value={form.references}
             onChange={(e) => handleChange("references", e.target.value)}
           />
+          <label className="text-sm text-gray-600">Video URL:</label>
           <input
             className="w-full border px-2 py-1 text-sm rounded"
             placeholder="Video URL"

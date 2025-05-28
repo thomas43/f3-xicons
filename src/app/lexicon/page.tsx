@@ -14,10 +14,11 @@ export default async function LexiconPage() {
       </p>
       <XiconBrowser 
         entries={entries} 
-        enableTags={false} 
-        searchPlaceholder="Search lexicon terms..."/>
+        enableTags={true} 
+        searchPlaceholder="Search lexicon terms..."
         isAdmin={false}
-        showTypeFilter = {false}
+        showTypeFilter={false}
+      />
     </div>
   );
 }

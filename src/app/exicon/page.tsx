@@ -22,7 +22,7 @@ export default async function ExiconPage() {
         enableTags={true}
         searchPlaceholder="Search exercises..."
         isAdmin={false}
-        showTypeFilter = {false}
+        showTypeFilter={false}
       />
     </main>
   );

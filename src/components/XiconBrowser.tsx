@@ -20,7 +20,8 @@ export default function XiconBrowser({
   isAdmin = false,
 }: Props) {
   const [search, setSearch] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagLogic, setTagLogic] = useState<"AND" | "OR">("OR");
   const [selectedType, setSelectedType] = useState<XiconType | "all">("all");
 
   const allTags = useMemo(() => {
@@ -31,16 +32,27 @@ export default function XiconBrowser({
 
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
-      const inTag = !selectedTag || entry.tags.includes(selectedTag);
-      const inType = selectedType === "all" || entry.type === selectedType;
-      const inSearch =
+      const matchesTags =
+        selectedTags.length === 0
+          ? true
+          : tagLogic === "AND"
+          ? selectedTags.every((tag) => entry.tags.includes(tag))
+          : selectedTags.some((tag) => entry.tags.includes(tag));
+  
+      const matchesType =
+        selectedType === "all" || entry.type === selectedType;
+  
+      const matchesSearch =
         entry.name.toLowerCase().includes(search.toLowerCase()) ||
         entry.description.toLowerCase().includes(search.toLowerCase()) ||
         entry.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase())) ||
-        entry.aliases.some((alias) => alias.toLowerCase().includes(search.toLowerCase()));
-      return inTag && inType && inSearch;
+        entry.aliases.some((alias) =>
+          alias.toLowerCase().includes(search.toLowerCase())
+        );
+  
+      return matchesTags && matchesType && matchesSearch;
     });
-  }, [entries, search, selectedTag, selectedType]);
+  }, [entries, search, selectedTags, selectedType, tagLogic]);
   
   return (
     <div>
@@ -69,22 +81,46 @@ export default function XiconBrowser({
       )}
 
       {enableTags && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {allTags.map((tag) => (
+        <div className="mb-4">
+          <div className="flex flex-wrap gap-2 mb-2">
+            {allTags.map((tag) => {
+              const isSelected = selectedTags.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    setSelectedTags((prev) =>
+                      prev.includes(tag)
+                        ? prev.filter((t) => t !== tag)
+                        : [...prev, tag]
+                    );
+                  }}
+                  className={`tag ${isSelected ? "tag-selected" : "tag-unselected"}`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="text-sm mb-2">
+            Match mode:{" "}
             <button
-              key={tag}
-              onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-              className={`tag ${tag === selectedTag ? "tag-selected" : "tag-unselected"}`}
+              onClick={() =>
+                setTagLogic(tagLogic === "AND" ? "OR" : "AND")
+              }
+              className="underline font-semibold"
             >
-              {tag}
+              {tagLogic}
             </button>
-          ))}
-          {selectedTag && (
+          </div>
+
+          {selectedTags.length > 0 && (
             <button
-              onClick={() => setSelectedTag(null)}
+              onClick={() => setSelectedTags([])}
               className="text-xs underline text-gray-500"
             >
-              Clear Filter
+              Clear tag filters
             </button>
           )}
         </div>

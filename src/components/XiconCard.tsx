@@ -155,7 +155,14 @@ export default function XiconCard({
 
           {entry.aliases && entry.aliases.length > 0 && (
             <p className="text-sm italic text-gray-500">
-              Also known as: {entry.aliases.join(', ')}
+              Also known as:{' '}
+              {entry.aliases
+                .map((alias, i) => (
+                  <span key={i}>
+                    {highlight(alias, search)}
+                    {i < entry.aliases.length - 1 ? ', ' : ''}
+                  </span>
+            ))}
             </p>
           )}
 

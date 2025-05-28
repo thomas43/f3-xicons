@@ -153,6 +153,12 @@ export default function XiconCard({
             <a href={`#${slug}`} className="xicon-anchor group-hover:opacity-100" />
           </h2>
 
+          {entry.aliases && entry.aliases.length > 0 && (
+            <p className="text-sm italic text-gray-500">
+              Also known as: {entry.aliases.join(', ')}
+            </p>
+          )}
+
           <p className="xicon-description">
             {renderDescriptionWithLinks(entry.description)}
           </p>

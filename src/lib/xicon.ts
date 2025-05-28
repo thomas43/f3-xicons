@@ -1,6 +1,10 @@
 // src/lib/xicon.ts
+"use server";
+
 import { prisma } from "@/lib/prisma";
-import { XiconType } from "@prisma/client";
+import { Xicon, XiconType } from "@prisma/client";
+import { redirect } from "next/navigation";
+
 
 export async function getXiconEntries() {
   return prisma.xicon.findMany({
@@ -20,4 +24,28 @@ export async function getLexiconEntries() {
       where: { type: XiconType.lexicon },
       orderBy: { name: "asc" },
     });
-  }
+}
+
+export async function deleteXicon(formData: FormData) {
+    const id = formData.get('id') as string;
+    if (!id) throw new Error("Missing ID");
+    
+    await prisma.xicon.delete({ where: { id } });
+
+    redirect("/admin/xicon");
+}
+
+export async function updateXicon(data: Xicon) {
+  return await prisma.xicon.update({
+    where: { id: data.id },
+    data: {
+      name: data.name,
+      description: data.description,
+      aliases: data.aliases,
+      tags: data.tags,
+      references: data.references,
+      videoUrl: data.videoUrl,
+    },
+  });
+}
+  

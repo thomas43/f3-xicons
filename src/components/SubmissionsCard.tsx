@@ -1,5 +1,8 @@
+"use client"
+
 import { Submission } from "@prisma/client";
 import { approveSubmission, rejectSubmission } from "@/lib/submission";
+import { slugify } from "@/lib/slugify"
 
 interface Props {
   submission: Submission;
@@ -9,11 +12,14 @@ export default function SubmissionsCard({ submission }: Props) {
   const bgClass =
     submission.status !== "pending" ? "bg-gray-200" : "bg-white";
 
+  const slug = slugify(submission.name);
+
   return (
     <div className={`border rounded-xl p-4 shadow-sm ${bgClass}`}>
       <div className="text-sm text-gray-500 mb-1">ID: {submission.id}</div>
       <h3 className="text-xl font-bold text-f3accent mb-2">{submission.name}</h3>
-      <div className="text-sm text-gray-700 mb-2">{submission.description}</div>
+      <div className="text-sm text-gray-700 mb-2">Description: {submission.description}</div>
+      <div className="text-sm text-gray-700 mb-2">Slug: {slug}</div>
 
       {submission.aliases.length > 0 && (
         <div className="text-sm mb-2">
@@ -41,9 +47,20 @@ export default function SubmissionsCard({ submission }: Props) {
         </div>
       )}
 
-      <div className="text-xs text-gray-500 mb-2">
-        {submission.type} | {submission.status} | {new Date(submission.createdAt).toLocaleString()}
-      </div>
+    <div className="text-xs text-gray-500 mb-2">
+       {submission.type} |{" "}
+       <span
+          className={
+            submission.status === "approved"
+            ? "text-green-600 font-semibold"
+            : submission.status === "rejected"
+            ? "text-red-600 font-semibold"
+            : "text-yellow-600 font-semibold"
+          }>
+      {submission.status}
+      </span>{" "}
+     | {new Date(submission.createdAt).toLocaleString()}
+     </div>
 
       <form action={approveSubmission} className="inline-block mr-2" >
         <input type="hidden" name="id" value={submission.id} />

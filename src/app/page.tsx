@@ -40,7 +40,7 @@ export default function Home() {
             <Link href="/lexicon" className="text-f3accent hover:underline">Lexicon Page</Link>
           </li>
           <li>
-            <Link href="/submit" className="text-f3accent hover:underline">Submit a New Entry</Link>
+            <Link href="/submit" className="text-f3accent hover:underline">Submit a New Xicon</Link>
           </li>
           <li>
             <Link href="/admin/submissions" className="text-f3accent hover:underline">Admin: Review Submissions</Link>

@@ -4,13 +4,13 @@
 import { prisma } from "@/lib/prisma";
 import { SubmissionStatus } from "@prisma/client"
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function getSubmissions() {
   return await prisma.submission.findMany({
     orderBy: { createdAt: "desc" },
   });
 }
-
 
 export async function submitEntry(formData: FormData) {
   const type = formData.get("type");
@@ -46,7 +46,7 @@ export async function submitEntry(formData: FormData) {
     },
   });
 
-  revalidatePath("/submit", "page");
+  redirect("/submit?submitted=true");
 }
 
 export async function approveSubmission(formData: FormData) {

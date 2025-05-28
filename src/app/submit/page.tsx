@@ -1,7 +1,14 @@
 // app/submit/page.tsx
 import { submitEntry } from "@/lib/submission";
+import { headers } from "next/headers"
+import { CheckCircleIcon } from "@heroicons/react/20/solid";
 
-export default function SubmitPage() {
+
+export default async function SubmitPage() {
+  const headersList = await headers();
+  const referer = headersList.get("referer") || "";
+  const submitted = referer.includes("/submit?submitted=true");
+
   return (
     <main className="max-w-2xl mx-auto py-10 px-4">
       <h1 className="text-2xl font-bold text-f3accent mb-6">Submit a New Entry</h1>
@@ -44,6 +51,13 @@ export default function SubmitPage() {
           Submit
         </button>
       </form>
+      
+      {submitted && (
+        <div className="flex items-start gap-2 text-green-700 bg-green-50 border border-green-300 4 px-3 py-2 rounded mt-6 mb-6 text-sm">
+          <CheckCircleIcon className="h-5 w-5 text-green-600 mt-0.5" />
+          <p>Thanks for your submission!</p>
+        </div>
+      )}
     </main>
   );
 }

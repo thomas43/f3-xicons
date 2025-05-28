@@ -1,5 +1,6 @@
 import { Xicon } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
+import { PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
 
 export default function XiconCard({
   entry,
@@ -32,20 +33,12 @@ export default function XiconCard({
   return (
     <div className="border-b pb-4 relative" id={slug}>
       {isAdmin && (
-        <div className="absolute top-1 right-1 flex gap-2 z-10">
-          <button
-            title="Edit"
-            className="text-xs text-gray-500 hover:text-black"
-            onClick={() => alert(`Edit ${entry.name}`)}
-          >
-            ✏️
+        <div className="absolute top-2 right-2 flex gap-2 z-10">
+          <button title="Edit" className="hover:text-black">
+            <PencilIcon className="w-4 h-4 text-gray-500" />
           </button>
-          <button
-            title="Delete"
-            className="text-xs text-red-500 hover:text-red-700"
-            onClick={() => alert(`Delete ${entry.name}`)}
-          >
-            🗑️
+          <button title="Delete" className="hover:text-red-700">
+            <TrashIcon className="w-4 h-4 text-red-500" />
           </button>
         </div>
       )}
@@ -70,6 +63,16 @@ export default function XiconCard({
               {tag}
             </span>
           ))}
+        </div>
+      )}
+
+      {isAdmin && (
+        <div className="mt-4 text-xs text-gray-500 space-y-1">
+          <div><strong>ID:</strong> {entry.id}</div>
+          <div><strong>Slug:</strong> {slug}</div>
+          <div><strong>Type:</strong> {entry.type}</div>
+          <div><strong>Created:</strong> {new Date(entry.createdAt).toLocaleString()}</div>
+          <div><strong>Updated:</strong> {new Date(entry.updatedAt).toLocaleString()}</div>
         </div>
       )}
     </div>

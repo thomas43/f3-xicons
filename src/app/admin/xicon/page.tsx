@@ -14,9 +14,10 @@ export default async function AdminXiconsPage() {
       </p>
       <XiconBrowser
         entries={entries}
-        enableTags={false}
+        enableTags={true}
         searchPlaceholder="Search Xicon entries..."
         isAdmin={true}
+        showTypeFilter = {true}
       />
     </div>
   );

@@ -17,6 +17,7 @@ export default async function LexiconPage() {
         enableTags={false} 
         searchPlaceholder="Search lexicon terms..."/>
         isAdmin={false}
+        showTypeFilter = {false}
     </div>
   );
 }

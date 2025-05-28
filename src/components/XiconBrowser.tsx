@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Xicon } from "@prisma/client";
+import { Xicon, XiconType } from "@prisma/client";
 import XiconCard from "./XiconCard";
 
 interface Props {
   entries: Xicon[];
-  enableTags: boolean;
+  enableTags?: boolean;
+  showTypeFilter?: boolean;
   searchPlaceholder?: string;
   isAdmin?: boolean;
 }
@@ -15,10 +16,12 @@ export default function XiconBrowser({
   entries,
   enableTags,
   searchPlaceholder = "Search...",
+  showTypeFilter = false,
   isAdmin = false,
 }: Props) {
   const [search, setSearch] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<XiconType | "all">("all");
 
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -29,15 +32,16 @@ export default function XiconBrowser({
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
       const inTag = !selectedTag || entry.tags.includes(selectedTag);
+      const inType = selectedType === "all" || entry.type === selectedType;
       const inSearch =
         entry.name.toLowerCase().includes(search.toLowerCase()) ||
         entry.description.toLowerCase().includes(search.toLowerCase()) ||
         entry.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase())) ||
         entry.aliases.some((alias) => alias.toLowerCase().includes(search.toLowerCase()));
-      return inTag && inSearch;
+      return inTag && inType && inSearch;
     });
-  }, [entries, search, selectedTag]);
-
+  }, [entries, search, selectedTag, selectedType]);
+  
   return (
     <div>
       <div className="mb-4">
@@ -49,6 +53,20 @@ export default function XiconBrowser({
           className="border px-3 py-1 rounded text-sm w-full"
         />
       </div>
+
+      {showTypeFilter && (
+        <div className="border-b pb-4 flex gap-2 flex-wrap mb-4">
+            <button onClick={() => setSelectedType("all")} className={`tag ${selectedType === "all" ? "tag-selected" : "tag-unselected"}`}>
+            All
+            </button>
+            <button onClick={() => setSelectedType(XiconType.exicon)} className={`tag ${selectedType === XiconType.exicon ? "tag-selected" : "tag-unselected"}`}>
+            Exicon
+            </button>
+            <button onClick={() => setSelectedType(XiconType.lexicon)} className={`tag ${selectedType === XiconType.lexicon ? "tag-selected" : "tag-unselected"}`}>
+            Lexicon
+            </button>
+        </div>
+      )}
 
       {enableTags && (
         <div className="flex flex-wrap gap-2 mb-4">

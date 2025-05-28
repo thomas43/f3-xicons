@@ -21,6 +21,7 @@ export default async function ExiconPage() {
         entries={entries}
         enableTags={true}
         searchPlaceholder="Search exercises..."
+        isAdmin={false}
       />
     </main>
   );

@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Xicon {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(cuid())
   type        XiconType
   name        String   @db.Text
   description String   @db.Text

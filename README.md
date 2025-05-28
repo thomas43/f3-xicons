@@ -62,6 +62,17 @@ $ npx ts-node prisma/seed/delete-lexison.ts
 $ npx prisma studio
 ```
 
+5. Reset db **will delete all data**
+```bash
+$ npx prisma migrate reset
+```
+
+6. Push/recreate after resetting
+```bash
+$ npx prisma db push --force-reset
+```
+
+
 ## Tailwind debugging
 
 1. See if it'll compile...

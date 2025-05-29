@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Xicon } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
 import { PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { deleteXicon, updateXicon } from "@/lib/xicon";
+import { updateXicon } from "@/lib/xicon";
+import { useToast } from "@/components/ToastProvider";
 
 export default function XiconCard({
   entry,
@@ -19,9 +20,9 @@ export default function XiconCard({
   onUpdate?: (updated: Xicon) => void;
   onDeleteRequested?: (id: string) => void;
 }) {
+  const { toastSuccess, toastError, toastInfo } = useToast();
   const slug = slugify(entry.name);
   const [editing, setEditing] = useState(false);
-  const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: entry.name,
     description: entry.description,
@@ -39,12 +40,12 @@ export default function XiconCard({
     const { name, description, videoUrl } = form;
 
     if (!name.trim() || !description.trim()) {
-      setStatusMsg("Name and description are required.");
+      toastError("Name and description are required.");
       return;
     }
 
     if (videoUrl && !/^https?:\/\/.+/.test(videoUrl)) {
-      setStatusMsg("Invalid video URL.");
+      toastError("Invalid video URL.");
       return;
     }
 
@@ -61,11 +62,11 @@ export default function XiconCard({
     try {
       await updateXicon(updated);
       onUpdate?.(updated);
-      setStatusMsg("Saved successfully.");
+      toastSuccess("Saved successfully.");
       setEditing(false);
     } catch (err) {
       console.error(err);
-      setStatusMsg("Failed to save.");
+      toastError("Failed to save.");
     }
   };
 
@@ -94,16 +95,6 @@ export default function XiconCard({
 
       {isAdmin && editing ? (
         <div className="space-y-2">
-          {statusMsg && (
-            <div className="mt-2 text-sm flex items-center gap-2 text-gray-700">
-              {statusMsg.startsWith("Saved") ? (
-                <CheckIcon className="h-4 w-4 text-green-600" />
-              ) : (
-                <XMarkIcon className="h-4 w-4 text-red-500" />
-              )}
-              <span>{statusMsg}</span>
-            </div>
-          )}
           <label className="text-sm text-gray-600">Name:</label>
           <input
             className="w-full border px-2 py-1 text-sm rounded"

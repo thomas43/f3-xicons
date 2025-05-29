@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Xicon, XiconType } from "@prisma/client";
 import { deleteXicon } from "@/lib/xicon";
 import XiconCard from "./XiconCard";
-import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { useToast } from "@/components/ToastProvider";
 
 interface Props {
   entries: Xicon[];
@@ -21,12 +21,12 @@ export default function XiconBrowser({
   showTypeFilter = false,
   isAdmin = false,
 }: Props) {
+  const { toastSuccess, toastError, toastInfo } = useToast();
   const [localEntries, setLocalEntries] = useState(entries);
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagLogic, setTagLogic] = useState<"AND" | "OR">("OR");
   const [selectedType, setSelectedType] = useState<XiconType | "all">("all");
-  const [deleteStatus, setDeleteStatus] = useState<string | null>(null);
 
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -63,13 +63,6 @@ export default function XiconBrowser({
       prev.map((e) => (e.id === updated.id ? updated : e))
     );
   };
-
-  useEffect(() => {
-    if (deleteStatus) {
-      const timeout = setTimeout(() => setDeleteStatus(null), 4000);
-      return () => clearTimeout(timeout);
-    }
-  }, [deleteStatus]);
 
   return (
     <div>
@@ -144,16 +137,6 @@ export default function XiconBrowser({
       )}
 
       <div className="space-y-4">
-      {deleteStatus && (
-        <div className="mb-4 text-sm text-gray-700 bg-gray-200 rounded-md px-3 py-2 flex items-center gap-2">
-            {deleteStatus.includes("success") ? (
-            <CheckIcon className="h-4 w-4 text-green-600" />
-            ) : (
-            <XMarkIcon className="h-4 w-4 text-red-500" />
-          )}
-          <span>{deleteStatus}</span>
-        </div>
-        )}
         {filteredEntries.map((entry) => (
           <XiconCard 
             key={entry.id} 
@@ -165,10 +148,10 @@ export default function XiconBrowser({
               try {
                 await deleteXicon({ id });
                 setLocalEntries((prev) => prev.filter((e) => e.id !== id));
-                setDeleteStatus(`"Deleted '${entry.name}' successfully."`);
+                toastSuccess(`"Deleted '${entry.name}' successfully."`);
               } catch (err) {
                 console.error(err);
-                setDeleteStatus(`"Failed to delete '${entry.name}'."`);
+                toastError(`"Failed to delete '${entry.name}'."`);
               }
             }}
           />

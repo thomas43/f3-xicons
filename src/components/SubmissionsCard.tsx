@@ -16,7 +16,6 @@ export default function SubmissionsCard({ submission, onUpdate }: Props) {
 
   const bgClass =
     submission.status !== "pending" ? "bg-gray-200" : "bg-white";
-  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   const slug = slugify(submission.name);
 
@@ -59,12 +58,6 @@ export default function SubmissionsCard({ submission, onUpdate }: Props) {
 
   return (
     <div className={`border rounded-xl p-4 shadow-sm ${bgClass}`}>
-      {statusMsg && (
-        <div className="mt-2 text-sm text-gray-700 bg-gray-200 rounded-md px-3 py-2">
-          {statusMsg}
-        </div>
-      )}
-
       <div className="text-sm text-gray-500 mb-1">ID: {submission.id}</div>
       <h3 className="text-xl font-bold text-f3accent mb-2">{submission.name}</h3>
       <div className="text-sm text-gray-700 mb-2">Description: {submission.description}</div>

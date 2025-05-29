@@ -2,7 +2,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { SubmissionStatus } from "@prisma/client"
+import { Submission, SubmissionStatus } from "@prisma/client"
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -49,28 +49,107 @@ export async function submitEntry(formData: FormData) {
   redirect("/submit?submitted=true");
 }
 
-export async function approveSubmission(formData: FormData) {
-  const id = formData.get("id");
-  if (typeof id !== "string") {
-    throw new Error("Submission ID must be a string");
-  }
+export async function approveSubmission(submissionId: string) {
+  if (!submissionId) throw new Error("Missing submission ID");
+
 
   await prisma.submission.update({
-    where: { id },
+    where: { id: submissionId },
     data: { status: SubmissionStatus.approved },
   });
-  revalidatePath("/admin/submissions");
+
+  return prisma.submission.findUnique({ where: { id: submissionId } });
+
 }
 
-export async function rejectSubmission(formData: FormData) {
-  const id = formData.get("id");
-  if (typeof id !== "string") {
-    throw new Error("Submission ID must be a string");
-  }
+export async function pendingSubmission(submissionId: string) {
+  if (!submissionId) throw new Error("Missing submission ID");
 
   await prisma.submission.update({
-    where: { id },
-    data: { status: SubmissionStatus.rejected },
+    where: { id: submissionId },
+    data: {
+      status: SubmissionStatus.pending,
+      // reviewedAt: new Date(),
+      // reviewedBy: ...
+    },
   });
-  revalidatePath("/admin/submissions");
+
+  return prisma.submission.findUnique({ where: { id: submissionId } });
+}
+
+export async function rejectSubmission(submissionId: string) {
+  if (!submissionId) throw new Error("Missing submission ID");
+
+  await prisma.submission.update({
+    where: { id: submissionId },
+    data: {
+      status: SubmissionStatus.rejected,
+      // reviewedAt: new Date(),
+      // reviewedBy: ...
+    },
+  });
+
+  return prisma.submission.findUnique({ where: { id: submissionId } });
+}
+
+
+export async function updateSubmission(id: string, data: Partial<Submission>) {
+  return prisma.submission.update({
+    where: { id },
+    data,
+  });
+
+  return prisma.submission.findUnique({ where: { id: id } });
+
+}
+
+export async function promoteSubmissionToXicon(submissionId: string) {
+  const submission = await prisma.submission.findUnique({
+    where: { id: submissionId },
+  });
+
+  if (!submission) throw new Error("Submission not found");
+
+  const {
+    name,
+    description,
+    aliases,
+    tags,
+    references,
+    videoUrl,
+    type,
+  } = submission;
+
+  const existing = await prisma.xicon.findFirst({
+    where: {
+      OR: [
+        { name: submission.name },
+        // Leaving these commented out for now, aliases don't need to hold up promotion
+        //{ aliases: { has: submission.name } },
+        //{ aliases: { hasSome: submission.aliases } },
+      ],
+    },
+  });
+  
+  if (existing) {
+    throw new Error("Duplicate found in Xicon entries.");
+  }
+  
+  await prisma.$transaction([
+    prisma.submission.update({
+      where: { id: submissionId },
+      data: { status: "approved" },
+    }),
+    prisma.xicon.create({
+      data: {
+        name,
+        description,
+        aliases,
+        tags,
+        references,
+        videoUrl,
+        type,
+      },
+    }),
+  ]);
 }

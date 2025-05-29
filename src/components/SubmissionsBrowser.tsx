@@ -9,6 +9,8 @@ type Props = {
 };
 
 export default function SubmissionsBrowser({ submissions }: Props) {
+  const [localSubmissions, setLocalSubmissions] = useState<Submission[]>(submissions);
+
   const [statusFilter, setStatusFilter] = useState<SubmissionStatus | null>(
     () => (typeof window !== "undefined" ? (localStorage.getItem("statusFilter") as SubmissionStatus) ?? null : null)
   );
@@ -26,7 +28,7 @@ export default function SubmissionsBrowser({ submissions }: Props) {
     else localStorage.removeItem("typeFilter");
   }, [typeFilter]);
 
-  const filtered = submissions.filter((s) => {
+  const filtered = localSubmissions.filter((s) => {
     return (
       (!statusFilter || s.status === statusFilter) &&
       (!typeFilter || s.type === typeFilter)
@@ -89,7 +91,14 @@ export default function SubmissionsBrowser({ submissions }: Props) {
         <ul className="space-y-6">
           {filtered.map((submission) => (
             <li key={submission.id}>
-              <SubmissionsCard submission={submission} />
+              <SubmissionsCard 
+                submission={submission} 
+                onUpdate={(updated: Submission) => {
+                  setLocalSubmissions((prev) =>
+                    prev.map((s) => (s.id === updated.id ? updated : s))
+                  );
+                }}
+              />
             </li>
           ))}
         </ul>

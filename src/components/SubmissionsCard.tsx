@@ -2,6 +2,7 @@
 
 import { Submission } from "@prisma/client";
 import { approveSubmission, pendingSubmission, rejectSubmission, promoteSubmissionToXicon } from "@/lib/submission";
+import { useToast } from "@/components/ToastProvider";
 import { slugify } from "@/lib/slugify"
 import { useState } from "react";
 
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export default function SubmissionsCard({ submission, onUpdate }: Props) {
+  const { toastSuccess, toastError, toastInfo } = useToast();
+
   const bgClass =
     submission.status !== "pending" ? "bg-gray-200" : "bg-white";
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
@@ -22,33 +25,33 @@ export default function SubmissionsCard({ submission, onUpdate }: Props) {
       if (!submission.id) throw new Error("Missing ID");
       const updated = await approveSubmission(submission.id);
       await promoteSubmissionToXicon(submission.id);
-      setStatusMsg("Submission approved and promoted.");
+      toastSuccess("Submission approved and promoted.");
       onUpdate?.(updated);
     } catch (err) {
       console.error(err);
-      setStatusMsg("Failed to approve submission.");
+      toastError("Failed to approve submission.");
     }
   };
   
   const handlePending = async () => {
     try {
       const updated = await pendingSubmission(submission.id);
-      setStatusMsg("Submission pending.");
+      toastInfo("Submission pending.");
       onUpdate?.(updated);
     } catch (err) {
       console.error(err);
-      setStatusMsg("Failed to set pending.");
+      toastError("Failed to set pending.");
     }
   };
 
   const handleReject = async () => {
     try {
       const updated = await rejectSubmission(submission.id);
-      setStatusMsg("Submission rejected.");
+      toastInfo("Submission rejected.");
       onUpdate?.(updated);
     } catch (err) {
       console.error(err);
-      setStatusMsg("Failed to reject.");
+      toastError("Failed to reject.");
     }
   };
   

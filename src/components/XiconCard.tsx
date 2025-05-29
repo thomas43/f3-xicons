@@ -220,9 +220,16 @@ function renderDescriptionWithLinks(text: string) {
   });
 }
 
+function escapeRegExp(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function highlight(text: string, query: string) {
   if (!query) return text;
-  const regex = new RegExp(`(${query})`, "gi");
+
+  const escapedQuery = escapeRegExp(query);
+
+  const regex = new RegExp(`(${escapedQuery})`, "gi");
   const parts = text.split(regex);
   return parts.map((part, i) =>
     regex.test(part) ? (

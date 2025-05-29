@@ -1,5 +1,4 @@
 // src/app/admin/xicons/page.tsx
-import { prisma } from "@/lib/prisma";
 import XiconBrowser from "@/components/XiconBrowser";
 import { getXiconEntries } from "@/lib/xicon";
 

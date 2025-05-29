@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Xicon, XiconType } from "@prisma/client";
 import { deleteXicon } from "@/lib/xicon";
 import XiconCard from "./XiconCard";
@@ -21,7 +21,7 @@ export default function XiconBrowser({
   showTypeFilter = false,
   isAdmin = false,
 }: Props) {
-  const { toastSuccess, toastError, toastInfo } = useToast();
+  const { toastSuccess, toastError } = useToast();
   const [localEntries, setLocalEntries] = useState(entries);
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);

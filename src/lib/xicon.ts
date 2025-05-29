@@ -3,7 +3,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { Xicon, XiconType } from "@prisma/client";
-import { redirect } from "next/navigation";
 
 
 export async function getXiconEntries() {

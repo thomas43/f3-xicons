@@ -1,5 +1,4 @@
 // src/app/lexicon/page.tsx
-import { prisma } from "@/lib/prisma";
 import XiconBrowser from "@/components/XiconBrowser";
 import { getLexiconEntries } from "@/lib/xicon";
 

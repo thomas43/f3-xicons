@@ -3,7 +3,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { Submission, SubmissionStatus } from "@prisma/client"
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function getSubmissions() {

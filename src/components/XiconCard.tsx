@@ -20,7 +20,7 @@ export default function XiconCard({
   onUpdate?: (updated: Xicon) => void;
   onDeleteRequested?: (id: string) => void;
 }) {
-  const { toastSuccess, toastError, toastInfo } = useToast();
+  const { toastSuccess, toastError } = useToast();
   const slug = slugify(entry.name);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({

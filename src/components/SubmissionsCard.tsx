@@ -4,7 +4,6 @@ import { Submission } from "@prisma/client";
 import { approveSubmission, pendingSubmission, rejectSubmission, promoteSubmissionToXicon } from "@/lib/submission";
 import { useToast } from "@/components/ToastProvider";
 import { slugify } from "@/lib/slugify"
-import { useState } from "react";
 
 interface Props {
   submission: Submission;

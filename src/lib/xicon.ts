@@ -26,16 +26,14 @@ export async function getLexiconEntries() {
     });
 }
 
-export async function deleteXicon(formData: FormData) {
-    const id = formData.get('id') as string;
-    if (!id) throw new Error("Missing ID");
-    
-    await prisma.xicon.delete({ where: { id } });
+export async function deleteXicon({ id }: { id: string }) {
+  if (!id) throw new Error("Missing ID");
 
-    redirect("/admin/xicon");
+  await prisma.xicon.delete({ where: { id } });
 }
 
-export async function updateXicon(data: Xicon) {
+
+export async function updateXicon(data: Xicon): Promise<Xicon> {
   return await prisma.xicon.update({
     where: { id: data.id },
     data: {

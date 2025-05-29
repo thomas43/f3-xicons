@@ -10,10 +10,14 @@ export default function XiconCard({
   entry,
   search,
   isAdmin = false,
+  onUpdate,
+  onDeleteRequested,
 }: {
   entry: Xicon;
   search: string;
   isAdmin?: boolean;
+  onUpdate?: (updated: Xicon) => void;
+  onDeleteRequested?: (id: string) => void;
 }) {
   const slug = slugify(entry.name);
   const [editing, setEditing] = useState(false);
@@ -55,7 +59,8 @@ export default function XiconCard({
     };
 
     try {
-      await updateXicon(updated); // make sure this function exists in `@/lib/xicon`
+      await updateXicon(updated);
+      onUpdate?.(updated);
       setStatusMsg("Saved successfully.");
       setEditing(false);
     } catch (err) {
@@ -67,28 +72,38 @@ export default function XiconCard({
   return (
     <div className="border-b pb-4 relative" id={slug}>
       {isAdmin && !editing && (
-        <form action={deleteXicon} className="absolute top-2 right-2 space-x-2 flex">
-          <input type="hidden" name="id" value={entry.id} />
-          <button
-            type="submit"
-            className="text-gray-400 hover:text-red-500"
-            title={`Delete '${entry.name}'`}
-          >
-            <TrashIcon className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="text-gray-400 hover:text-blue-500"
-            title={`Edit '${entry.name}'`}
-          >
-            <PencilIcon className="h-5 w-5" />
-          </button>
-        </form>
+        <div className="absolute top-2 right-2 space-x-2 flex">
+        <button
+          type="button"
+          onClick={() => onDeleteRequested?.(entry.id)}
+          className="text-gray-400 hover:text-red-500"
+          title={`Delete '${entry.name}'`}
+        >
+          <TrashIcon className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          className="text-gray-400 hover:text-blue-500"
+          title={`Edit '${entry.name}'`}
+        >
+          <PencilIcon className="h-5 w-5" />
+        </button>
+      </div>
       )}
 
       {isAdmin && editing ? (
         <div className="space-y-2">
+          {statusMsg && (
+            <div className="mt-2 text-sm flex items-center gap-2 text-gray-700">
+              {statusMsg.startsWith("Saved") ? (
+                <CheckIcon className="h-4 w-4 text-green-600" />
+              ) : (
+                <XMarkIcon className="h-4 w-4 text-red-500" />
+              )}
+              <span>{statusMsg}</span>
+            </div>
+          )}
           <label className="text-sm text-gray-600">Name:</label>
           <input
             className="w-full border px-2 py-1 text-sm rounded"
@@ -146,9 +161,6 @@ export default function XiconCard({
               <XMarkIcon className="h-5 w-5" />
             </button>
           </div>
-          {statusMsg && (
-            <div className="text-xs mt-2 text-gray-600">{statusMsg}</div>
-          )}
         </div>
       ) : (
         <>

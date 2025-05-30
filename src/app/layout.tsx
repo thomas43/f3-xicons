@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ToastProvider";
 import { Navbar } from "@/components/Navbar";
+import { BackToTopButton } from "@/components/BackToTopButton"
 
 
 const inter = Inter({
@@ -23,10 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased font-sans`}>
-      <Navbar />
+       <Navbar />
         <ToastProvider>        
           {children}
         </ToastProvider>
+       <BackToTopButton />
       </body>
     </html>
   );

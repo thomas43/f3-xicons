@@ -40,7 +40,6 @@ export async function updateXicon(data: Xicon): Promise<Xicon> {
       description: data.description,
       aliases: data.aliases,
       tags: data.tags,
-      references: data.references,
       videoUrl: data.videoUrl,
     },
   });

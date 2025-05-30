@@ -114,7 +114,6 @@ export async function promoteSubmissionToXicon(submissionId: string) {
     description,
     aliases,
     tags,
-    references,
     videoUrl,
     type,
   } = submission;
@@ -145,7 +144,6 @@ export async function promoteSubmissionToXicon(submissionId: string) {
         description,
         aliases,
         tags,
-        references,
         videoUrl,
         type,
       },

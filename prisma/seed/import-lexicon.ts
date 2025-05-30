@@ -38,7 +38,6 @@ async function importLexicon() {
           description,
           aliases: [], // May update later when data is added to CSV
           tags: [],
-          references: parseReferences(description),
           videoUrl: null,
         },
         create: {
@@ -47,7 +46,6 @@ async function importLexicon() {
           type: XiconType.lexicon,
           aliases: [],
           tags: [],
-          references: parseReferences(description),
           videoUrl: null,
         },
       });

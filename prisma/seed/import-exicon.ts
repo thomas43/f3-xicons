@@ -43,7 +43,6 @@ async function importExicon() {
           description,
           aliases: [],
           tags,
-          references: parseReferences(description),
           videoUrl: null,
         },
         create: {
@@ -52,7 +51,6 @@ async function importExicon() {
           type: XiconType.exicon,
           aliases: [],
           tags,
-          references: parseReferences(description),
           videoUrl: null,
         },
       });

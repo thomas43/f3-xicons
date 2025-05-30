@@ -14,7 +14,6 @@ model Xicon {
   description String   @db.Text
   aliases     String[] @default([])
   tags        String[] @default([]) // Only used for Exicon
-  references  String[] @default([])
   videoUrl    String?  @db.Text     // Only used for Exicon
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -29,7 +28,6 @@ model Submission {
   description String
   aliases     String[] @default([])
   tags        String[] @default([])
-  references  String[] @default([])
   videoUrl    String?  @db.Text
   status      SubmissionStatus  @default(pending) // or use enum: pending, approved, rejected
   createdAt   DateTime @default(now())

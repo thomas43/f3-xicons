@@ -30,7 +30,6 @@ export default function XiconCard({
     description: entry.description,
     aliases: entry.aliases.join(", "),
     tags: entry.tags.join(", "),
-    references: entry.references.join(", "),
     videoUrl: entry.videoUrl || "",
   });
 
@@ -57,7 +56,6 @@ export default function XiconCard({
       description: form.description.trim(),
       aliases: form.aliases.split(",").map((a) => a.trim()).filter(Boolean),
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      references: form.references.split(",").map((r) => r.trim()).filter(Boolean),
       videoUrl: form.videoUrl.trim() || null,
     };
 
@@ -122,13 +120,6 @@ export default function XiconCard({
             placeholder="Tags, Comma-separated"
             value={form.tags}
             onChange={(e) => handleChange("tags", e.target.value)}
-          />
-          <label className="text-sm text-gray-600">References: </label>
-          <input
-            className="w-full border px-2 py-1 text-sm rounded"
-            placeholder="References, Comma-separated"
-            value={form.references}
-            onChange={(e) => handleChange("references", e.target.value)}
           />
           <label className="text-sm text-gray-600">Video URL:</label>
           <input

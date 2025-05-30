@@ -191,19 +191,31 @@ export default function XiconCard({
             </div>
           )}
 
-          {embedUrl && (
+          {entry.videoUrl && (
             <div className="mt-4">
-              <iframe
-                width="100%"
-                height="315"
-                src={embedUrl}
-                title={`Video for ${entry.name}`}
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="rounded-xl shadow-md"
-              />
+              {embedUrl ? (
+                <iframe
+                  width="100%"
+                  height="315"
+                  src={embedUrl}
+                  title={`Video for ${entry.name}`}
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-xl shadow-md"
+                />
+              ) : (
+                <a
+                  href={entry.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-f3link underline"
+                >
+                  {entry.videoUrl}
+                </a>
+              )}
             </div>
           )}
+
 
           {isAdmin && (
             <div className="mt-4 text-xs text-gray-500 space-y-1">
@@ -258,6 +270,18 @@ function highlight(text: string, query: string) {
   );
 }
 
-const getYouTubeEmbedUrl = (url: string): string => {
-  return url.replace("watch?v=", "embed/");
+const isYouTubeUrl = (url: string): boolean => {
+  if (url.includes("youtube.com/watch?v=")) {
+    return true;
+  }
+
+  return false;
+};
+
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  if (isYouTubeUrl(url)) {
+    return url.replace("watch?v=", "embed/");
+  }
+
+  return null;
 };

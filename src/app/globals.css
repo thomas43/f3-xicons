@@ -36,6 +36,10 @@
     color: var(--color-f3accent);
   }
 
+  .text-f3link {
+    color: var(--color-f3link)
+  }
+
   .bg-f3gray {
     background-color: var(--color-f3gray);
   }

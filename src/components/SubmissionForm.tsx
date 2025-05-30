@@ -7,12 +7,15 @@ import { submitEntry } from "@/lib/submission";
 import { slugify } from "@/lib/slugify";
 import { getExiconEntries, getLexiconEntries } from "@/lib/xicon";
 import { MentionTextArea } from "@/components/MentionTextArea";
+import { TagInput } from "@/components/TagInput";
 import { XiconType } from "@prisma/client";
 
 export default function SubmissionForm() {
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [mentionData, setMentionData] = useState<{ id: string; display: string }[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [type, setType] = useState<"exicon"| "lexicon" >("exicon");
   const { toastError, toastSuccess } = useToast();
@@ -39,6 +42,32 @@ export default function SubmissionForm() {
   
     fetch();
   }, [type]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const entries = type === "exicon"
+        ? await getExiconEntries()
+        : await getLexiconEntries();
+  
+      const seen = new Set<string>();
+      const uniqueTags: string[] = [];
+  
+      for (const x of entries) {
+        for (const tag of x.tags ?? []) {
+          const clean = tag.trim();
+          if (clean && !seen.has(clean)) {
+            seen.add(clean);
+            uniqueTags.push(clean);
+          }
+        }
+      }
+  
+      setAvailableTags(uniqueTags);
+    };
+  
+    fetch();
+  }, [type]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -52,6 +81,7 @@ export default function SubmissionForm() {
         setStatus("success");
         form.reset();
         setDescription(""); // clear controlled input
+        setTags([]);
       } catch (err: any) {
         toastError(err.message || "Submission failed");
         setStatus("error");
@@ -95,8 +125,9 @@ export default function SubmissionForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Tags (comma-separated)</label>
-        <input name="tags" type="text" className="w-full border p-2 rounded" />
+      <label className="block text-sm font-medium">Tags</label>
+        <TagInput allTags={availableTags} selected={tags} onChange={setTags} />
+        <input type="hidden" name="tags" value={tags.join(",")} />
       </div>
 
       <div>

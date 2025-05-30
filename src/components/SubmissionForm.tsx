@@ -8,7 +8,6 @@ import { slugify } from "@/lib/slugify";
 import { getExiconEntries, getLexiconEntries } from "@/lib/xicon";
 import { MentionTextArea } from "@/components/MentionTextArea";
 import { TagInput } from "@/components/TagInput";
-import { XiconType } from "@prisma/client";
 
 export default function SubmissionForm() {
   const [isPending, startTransition] = useTransition();

@@ -11,6 +11,7 @@ type TagInputProps = {
 export function TagInput({ allTags, selected, onChange }: TagInputProps) {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+  const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
 
@@ -66,7 +67,7 @@ export function TagInput({ allTags, selected, onChange }: TagInputProps) {
         {selected.map((tag) => (
           <span
             key={tag}
-            className="tag tag-selected flex items-center gap-1"
+            className="tag tag-unselected flex items-center gap-1"
           >
             {tag}
             <button
@@ -84,12 +85,14 @@ export function TagInput({ allTags, selected, onChange }: TagInputProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKey}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 100)}
           className="flex-1 min-w-[150px] focus:outline-none text-sm"
           placeholder="Type to add tags..."
         />
       </div>
 
-      {filtered.length > 0 && (
+      {(query !== "" || focused) && filtered.length > 0 && (
         <ul
           ref={dropdownRef}
           className="mt-2 border rounded bg-white shadow text-sm max-h-32 overflow-y-auto"
@@ -99,7 +102,7 @@ export function TagInput({ allTags, selected, onChange }: TagInputProps) {
               key={tag}
               className={`px-3 py-1 cursor-pointer transition-colors duration-75 ${
                 i === activeIndex
-                  ? "bg-blue-600 text-white"
+                  ? "bg-blue-400 text-white"
                   : "hover:bg-blue-100 text-gray-800"
               }`}
               onMouseDown={(e) => {

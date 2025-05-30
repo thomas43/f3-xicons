@@ -1,42 +1,78 @@
 // src/components/SubmissionForm.tsx
 "use client";
 
-import { useTransition, useState } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { useToast } from "@/components/ToastProvider";
 import { submitEntry } from "@/lib/submission";
+import { slugify } from "@/lib/slugify";
+import { getExiconEntries, getLexiconEntries } from "@/lib/xicon";
+import { MentionTextArea } from "@/components/MentionTextArea";
+import { XiconType } from "@prisma/client";
 
 export default function SubmissionForm() {
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const {toastError, toastSuccess} = useToast();
+  const [mentionData, setMentionData] = useState<{ id: string; display: string }[]>([]);
+  const [description, setDescription] = useState("");
+  const [type, setType] = useState<"exicon"| "lexicon" >("exicon");
+  const { toastError, toastSuccess } = useToast();
 
+  useEffect(() => {
+    const fetch = async () => {
+      const entries = type === "exicon"
+        ? await getExiconEntries()
+        : await getLexiconEntries();
+  
+      const seen = new Set<string>();
+      const uniqueMentions: { id: string; display: string }[] = [];
+  
+      for (const x of entries) {
+        const id = slugify(x.name);
+        if (!seen.has(id)) {
+          seen.add(id);
+          uniqueMentions.push({ id, display: x.name });
+        }
+      }
+  
+      setMentionData(uniqueMentions);
+    };
+  
+    fetch();
+  }, [type]);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    data.set("description", description); // append controlled field
 
-    const form = e.currentTarget; 
     startTransition(async () => {
-        try {
-            await submitEntry(new FormData(form));
-            toastSuccess("Submission received!");
-            setStatus("success");
-            form.reset(); 
-        } catch (err: any) {
-            toastError(err.message || "Submission failed");
-            setStatus("error");
-        }
+      try {
+        await submitEntry(data);
+        toastSuccess("Submission received!");
+        setStatus("success");
+        form.reset();
+        setDescription(""); // clear controlled input
+      } catch (err: any) {
+        toastError(err.message || "Submission failed");
+        setStatus("error");
+      }
     });
-
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium">Type</label>
-        <select name="type" className="w-full border p-2 rounded" required>
+        <select
+          name="type"
+          value={type}
+          onChange={(e) => setType(e.target.value as "exicon" | "lexicon")}
+          className="w-full border p-2 rounded"
+          required
+        >
           <option value="exicon">Exicon</option>
           <option value="lexicon">Lexicon</option>
-        </select>
+      </select>
       </div>
 
       <div>
@@ -46,7 +82,11 @@ export default function SubmissionForm() {
 
       <div>
         <label className="block text-sm font-medium">Description</label>
-        <textarea name="description" className="w-full border p-2 rounded" rows={4} required />
+        <MentionTextArea
+          value={description}
+          onChange={setDescription}
+          suggestions={mentionData}
+        />
       </div>
 
       <div>
@@ -64,7 +104,11 @@ export default function SubmissionForm() {
         <input name="videoUrl" type="url" className="w-full border p-2 rounded" />
       </div>
 
-      <button type="submit" className="bg-f3accent text-white py-2 px-4 rounded" disabled={isPending}>
+      <button
+        type="submit"
+        className="bg-f3accent text-white py-2 px-4 rounded"
+        disabled={isPending}
+      >
         {isPending ? "Submitting..." : "Submit"}
       </button>
     </form>

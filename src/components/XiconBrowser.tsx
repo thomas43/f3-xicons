@@ -106,26 +106,27 @@ export default function XiconBrowser({
 
   return (
     <div>
-      <div className="mb-4 relative">
+    <div className="mb-4">
+      <div className="relative w-full">
         <input
           type="text"
           placeholder={searchPlaceholder}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border px-3 py-1 rounded text-sm w-full pr-8 h-full"
-          />
+          className="border px-3 py-1 rounded text-sm w-full pr-8 h-9"
+        />
         {search && (
           <button
             type="button"
             onClick={() => setSearch("")}
-            className="absolute top-6 right-3 text-gray-600 hover:text-gray-600"
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-gray-600"
             aria-label="Clear search"
           >
             <XMarkIcon className="h-4 w-4" />
           </button>
         )}
       </div>
-
+    </div>
 
       {showTypeFilter && (
         <div className="border-b pb-4 flex gap-2 flex-wrap mb-4">

@@ -6,8 +6,9 @@ const navLinks = [
   { href: "/exicon", label: "Exicon" },
   { href: "/lexicon", label: "Lexicon" },
   { href: "/submit", label: "Submit" },
-  { href: "/admin/xicon", label: "Admin" },
-  { href: "/admin/submissions", label: "Submissions" },
+  { href: "/admin", label: "Admin" },
+  { href: "/admin/xicon", label: "Admin/Xicon" },
+  { href: "/admin/submissions", label: "Admin/Submissions" },
 ];
 
 export function Navbar() {

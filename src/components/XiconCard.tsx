@@ -22,6 +22,8 @@ export default function XiconCard({
 }) {
   const { toastSuccess, toastError } = useToast();
   const slug = slugify(entry.name);
+  const embedUrl = entry.videoUrl ? getYouTubeEmbedUrl(entry.videoUrl) : null;
+
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     name: entry.name,
@@ -189,6 +191,20 @@ export default function XiconCard({
             </div>
           )}
 
+          {embedUrl && (
+            <div className="mt-4">
+              <iframe
+                width="100%"
+                height="315"
+                src={embedUrl}
+                title={`Video for ${entry.name}`}
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="rounded-xl shadow-md"
+              />
+            </div>
+          )}
+
           {isAdmin && (
             <div className="mt-4 text-xs text-gray-500 space-y-1">
               <div><strong>ID:</strong> {entry.id}</div>
@@ -241,3 +257,7 @@ function highlight(text: string, query: string) {
     )
   );
 }
+
+const getYouTubeEmbedUrl = (url: string): string => {
+  return url.replace("watch?v=", "embed/");
+};

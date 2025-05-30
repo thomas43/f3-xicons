@@ -20,7 +20,7 @@ export default function SubmissionForm() {
             await submitEntry(new FormData(form));
             toastSuccess("Submission received!");
             setStatus("success");
-            form.reset(); // ✅ safe
+            form.reset(); 
         } catch (err: any) {
             toastError(err.message || "Submission failed");
             setStatus("error");

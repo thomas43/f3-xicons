@@ -45,7 +45,7 @@ export async function submitEntry(formData: FormData) {
     },
   });
 
-  redirect("/submit?submitted=true");
+  //redirect("/submit?submitted=true");
 }
 
 export async function approveSubmission(submissionId: string) {

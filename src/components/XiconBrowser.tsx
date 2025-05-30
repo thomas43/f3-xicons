@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Xicon, XiconType } from "@prisma/client";
 import { deleteXicon } from "@/lib/xicon";
 import XiconCard from "./XiconCard";
 import { useToast } from "@/components/ToastProvider";
+import { slugify } from "@/lib/slugify";
 
 interface Props {
   entries: Xicon[];
@@ -58,6 +59,44 @@ export default function XiconBrowser({
     });
   }, [localEntries, search, selectedTags, selectedType, tagLogic]);
   
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash?.slice(1);
+      if (!hash) return;
+  
+      const match = entries.find((entry) => slugify(entry.name) === hash);
+      if (match) {
+        setSearch("");
+        setSelectedTags([]);
+        setSelectedType("all");
+  
+        setTimeout(() => {
+          const el = document.getElementById(hash);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 100);
+
+        // Clear hash after 2 seconds
+        setTimeout(() => {
+          if (window.location.hash) {
+            history.replaceState(null, "", window.location.pathname + window.location.search);
+          }
+        }, 2000);
+      }
+    };
+  
+    // Run once on initial load
+    handleHashChange();
+  
+    // Listen for future hash changes
+    window.addEventListener("hashchange", handleHashChange);
+  
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [entries]);  
+
   const updateEntry = (updated: Xicon) => {
     setLocalEntries((prev) =>
       prev.map((e) => (e.id === updated.id ? updated : e))

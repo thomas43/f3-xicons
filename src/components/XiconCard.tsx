@@ -224,10 +224,10 @@ export default function XiconCard({
 }
 
 function renderDescriptionWithLinks(text: string) {
-  const parts = text.split(/(@[\w\s\-]+)/g);
+  const parts = text.split(/(@[\w\-]+)/g); // only split on valid @mentions
   return parts.map((part, i) => {
     if (part.startsWith("@")) {
-      const refName = part.slice(1).trim();
+      const refName = part.slice(1); // do NOT trim or include anything after
       const refSlug = slugify(refName);
       return (
         <a key={i} href={`#${refSlug}`} className="text-f3link underline">

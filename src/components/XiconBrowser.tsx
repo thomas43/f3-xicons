@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Xicon, XiconType } from "@prisma/client";
 import { deleteXicon } from "@/lib/xicon";
-import XiconCard from "./XiconCard";
+import { XiconCard } from "./XiconCard";
 import { useToast } from "@/components/ToastProvider";
 import { slugify } from "@/lib/slugify";
 import { XMarkIcon } from "@heroicons/react/20/solid";

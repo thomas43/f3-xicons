@@ -61,6 +61,8 @@ export function MentionTextArea({ value, onChange, suggestions }: Props) {
     const input = e.target.value;
     onChange(input);
 
+    console.log(suggestions);
+
     const caret = e.target.selectionStart;
     const textBefore = input.slice(0, caret);
     const match = textBefore.match(/(^|\s)@([\w-]*)$/);
@@ -73,20 +75,25 @@ export function MentionTextArea({ value, onChange, suggestions }: Props) {
         s.display.toLowerCase().includes(query)
       );
 
-      const rect = e.target.getBoundingClientRect();
+      //const rect = e.target.getBoundingClientRect();
       const lineHeight = 20;
       const lines = textBefore.substring(0, wordStart).split("\n");
 
-      setDropdown({
-        open: true,
-        options: filtered,
-        position: {
-          top: lines.length * lineHeight,
-          left: (lines.at(-1)?.length ?? 0) * 7.5 + 12,
-        },
-        activeWord: query,
-        startIndex: wordStart,
-      });
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const rect = textarea.getBoundingClientRect();
+
+    setDropdown({
+    open: true,
+    options: filtered,
+    position: {
+        top: textarea.offsetTop + textarea.offsetHeight,
+        left: textarea.offsetLeft + 12, // aligns with padding
+    },
+    activeWord: query,
+    startIndex: wordStart,
+    });
       setActiveIndex(0);
     } else {
       setDropdown((d) => ({ ...d, open: false }));

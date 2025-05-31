@@ -1,278 +1,265 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Xicon } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
-import { PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { updateXicon } from "@/lib/xicon";
+import { updateXicon, getExiconEntries, getLexiconEntries } from "@/lib/xicon";
 import { useToast } from "@/components/ToastProvider";
+import {
+  PencilIcon,
+  TrashIcon,
+  CheckIcon,
+  XMarkIcon,
+} from "@heroicons/react/20/solid";
 
-export default function XiconCard({
-  entry,
-  search,
-  isAdmin = false,
-  onUpdate,
-  onDeleteRequested,
-}: {
+import { TagInput } from "@/components/TagInput";
+import { MentionTextArea } from "@/components/MentionTextArea";
+
+interface Props {
   entry: Xicon;
   search: string;
   isAdmin?: boolean;
   onUpdate?: (updated: Xicon) => void;
   onDeleteRequested?: (id: string) => void;
-}) {
+}
+
+export function XiconCard({
+  entry,
+  search,
+  isAdmin = false,
+  onUpdate,
+  onDeleteRequested,
+}: Props) {
   const { toastSuccess, toastError } = useToast();
   const slug = slugify(entry.name);
-  const embedUrl = entry.videoUrl ? getYouTubeEmbedUrl(entry.videoUrl) : null;
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     name: entry.name,
     description: entry.description,
-    aliases: entry.aliases.join(", "),
-    tags: entry.tags.join(", "),
-    videoUrl: entry.videoUrl || "",
+    aliasesCsv: Array.isArray(entry.aliases) ? entry.aliases.join(", ") : "",
+    tags: Array.isArray(entry.tags) ? entry.tags : [],
+    videoUrl: entry.videoUrl ?? "",
   });
 
-  const handleChange = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [mentionData, setMentionData] = useState<{ id: string; display: string }[]>([]);
+  const fetchedTags = useRef(false);
+
+  const startEditing = async () => {
+    setEditing(true);
+
+    if (fetchedTags.current) return;
+    fetchedTags.current = true;
+
+    const entries = entry.type === "exicon"
+      ? await getExiconEntries()
+      : await getLexiconEntries();
+
+    const seen = new Set<string>();
+    const uniqueTags: string[] = [];
+    const uniqueMentions: { id: string; display: string }[] = [];
+
+    for (const x of entries) {
+      const id = slugify(x.name);
+      if (!seen.has(id)) {
+        seen.add(id);
+        uniqueMentions.push({ id, display: x.name });
+      }
+    }
+
+    setMentionData(uniqueMentions);
+    //console.log(uniqueMentions);
+
+    for (const x of entries) {
+      for (const tag of x.tags ?? []) {
+        const clean = tag.trim();
+        if (clean && !seen.has(clean)) {
+          seen.add(clean);
+          uniqueTags.push(clean);
+        }
+      }
+    }
+
+    setAvailableTags(uniqueTags);
   };
 
   const handleSave = async () => {
-    const { name, description, videoUrl } = form;
-
-    if (!name.trim() || !description.trim()) {
-      toastError("Name and description are required.");
-      return;
-    }
-
-    if (videoUrl && !/^https?:\/\/.+/.test(videoUrl)) {
-      toastError("Invalid video URL.");
-      return;
-    }
-
-    const updated = {
-      ...entry,
-      name: form.name.trim(),
-      description: form.description.trim(),
-      aliases: form.aliases.split(",").map((a) => a.trim()).filter(Boolean),
-      tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      videoUrl: form.videoUrl.trim() || null,
-    };
-
     try {
-      await updateXicon(updated);
-      onUpdate?.(updated);
-      toastSuccess("Saved successfully.");
+      const updated = await updateXicon({ 
+        ...entry, 
+        ...form, 
+        aliases: form.aliasesCsv
+          .split(",")
+          .map((a :string) => a.trim())
+          .filter(Boolean), });
+      
+      toastSuccess("Saved!");
       setEditing(false);
+      onUpdate?.(updated);
     } catch (err) {
-      console.error(err);
-      toastError("Failed to save.");
+      toastError("Update failed");
     }
   };
 
+  function renderDescriptionWithLinks(text: string) {
+    const parts = text.split(/(@[\w\-]+)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith("@")) {
+        const refName = part.slice(1);
+        const refSlug = slugify(refName);
+        return (
+          <a key={i} href={`#${refSlug}`} className="text-f3link underline">
+            @{refName}
+          </a>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
+  }
+  
+
+  const renderVideo = () => {
+    if (!form.videoUrl) return null;
+    const embedUrl = getYouTubeEmbedUrl(form.videoUrl);
+    if (!embedUrl) {
+      return (
+        <a
+          href={form.videoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-f3accent underline"
+        >
+          {form.videoUrl}
+        </a>
+      );
+    }
+    return (
+      <iframe
+        className="w-full h-64 mb-4"
+        src={embedUrl}
+        title="Xicon video"
+        allowFullScreen
+      />
+    );
+  };
+
+  const getYouTubeEmbedUrl = (url: string): string | null => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
   return (
-    <div className="border-b pb-4 relative" id={slug}>
-      {isAdmin && !editing && (
-        <div className="absolute top-2 right-2 space-x-2 flex">
-        <button
-          type="button"
-          onClick={() => onDeleteRequested?.(entry.id)}
-          className="text-gray-400 hover:text-red-500"
-          title={`Delete '${entry.name}'`}
-        >
-          <TrashIcon className="h-5 w-5" />
-        </button>
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="text-gray-400 hover:text-blue-500"
-          title={`Edit '${entry.name}'`}
-        >
-          <PencilIcon className="h-5 w-5" />
-        </button>
-      </div>
-      )}
-
-      {isAdmin && editing ? (
-        <div className="space-y-2">
-          <label className="text-sm text-gray-600">Name:</label>
+    <div className="border border-gray-300 rounded p-4 mb-4 bg-white shadow-md">
+      {editing ? (
+        <div className="space-y-4">
           <input
-            className="w-full border px-2 py-1 text-sm rounded"
+            type="text"
             value={form.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-          />
-          <label className="text-sm text-gray-600">Description:</label>
-          <textarea
-            className="w-full border px-2 py-1 text-sm rounded"
-            value={form.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-          />
-          <label className="text-sm text-gray-600">Aliases:</label>
-          <input
-            className="w-full border px-2 py-1 text-sm rounded"
-            placeholder="Aliases, Comma-separated"
-            value={form.aliases}
-            onChange={(e) => handleChange("aliases", e.target.value)}
-          />
-          <label className="text-sm text-gray-600">Tags:</label>
-          <input
-            className="w-full border px-2 py-1 text-sm rounded"
-            placeholder="Tags, Comma-separated"
-            value={form.tags}
-            onChange={(e) => handleChange("tags", e.target.value)}
-          />
-          <label className="text-sm text-gray-600">Video URL:</label>
-          <input
-            className="w-full border px-2 py-1 text-sm rounded"
-            placeholder="Video URL"
-            value={form.videoUrl}
-            onChange={(e) => handleChange("videoUrl", e.target.value)}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            placeholder="Name"
           />
 
-          <div className="flex gap-2 mt-2">
+        <div className="flex">
+          <MentionTextArea
+            value={form.description}
+            onChange={(val) => setForm({ ...form, description: val })}
+            suggestions={mentionData}
+            className="mt-1 w-full border px-2 py-1 rounded text-sm"
+          />
+        </div>
+          <div>
+            <label className="block text-sm font-medium">Aliases (comma separated)</label>
+            <input
+              type="text"
+              value={form.aliasesCsv}
+              onChange={(e) => setForm({ ...form, aliasesCsv: e.target.value })}
+              placeholder="e.g. 8-count body builder, burpee"
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Tags</label>
+            <TagInput
+              allTags={availableTags}
+              selected={form.tags}
+              onChange={(tags) => setForm({ ...form, tags })}
+            />
+            <input type="hidden" name="tags" value={form.tags.join(",")} />
+          </div>
+
+          <input
+            type="text"
+            value={form.videoUrl}
+            onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+            placeholder="YouTube video URL"
+            className="w-full border border-gray-300 rounded px-3 py-2"
+          />
+
+          <div className="flex gap-2 justify-end">
             <button
               onClick={handleSave}
-              className="text-green-600 hover:text-green-800"
-              title="Save"
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center"
             >
-              <CheckIcon className="h-5 w-5" />
+              <CheckIcon className="h-4 w-4 mr-1" /> Save
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="text-gray-400 hover:text-gray-600"
-              title="Cancel"
+              className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded flex items-center"
             >
-              <XMarkIcon className="h-5 w-5" />
+              <XMarkIcon className="h-4 w-4 mr-1" /> Cancel
             </button>
           </div>
         </div>
       ) : (
-        <>
-          <h2 className="xicon-heading group">
-            <a href={`#${slug}`} className="text-inherit hover:underline">
-              {highlight(entry.name, search)}
-            </a>
-            <a href={`#${slug}`} className="xicon-anchor group-hover:opacity-100" />
-          </h2>
+        <div>
+          <div className="flex justify-between items-start">
+            <h2 className="text-lg font-semibold text-gray-900" id={slug}>{entry.name}</h2>
+            {isAdmin && (
+              <div className="flex gap-2">
+                <button
+                  onClick={startEditing}
+                  className="text-gray-500 hover:text-f3accent"
+                >
+                  <PencilIcon className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => onDeleteRequested?.(entry.id)}
+                  className="text-red-500 hover:text-red-600"
+                >
+                  <TrashIcon className="h-5 w-5" />
+                </button>
+              </div>
+            )}
+          </div>
 
-          {entry.aliases && entry.aliases.length > 0 && (
-            <p className="text-sm italic text-gray-500">
-              Also known as:{' '}
-              {entry.aliases
-                .map((alias, i) => (
-                  <span key={i}>
-                    {highlight(alias, search)}
-                    {i < entry.aliases.length - 1 ? ', ' : ''}
-                  </span>
-            ))}
+          <div className="mt-2 text-sm text-gray-700 whitespace-pre-line">
+            {renderDescriptionWithLinks(entry.description)}
+          </div>
+          
+          {entry.aliases?.length > 0 && (
+            <p className="text-xs text-gray-500 mt-2">
+              <strong>Aliases:</strong> {entry.aliases.join(", ")}
             </p>
           )}
-
-          <p className="xicon-description">
-            {renderDescriptionWithLinks(entry.description)}
-          </p>
-
-          {entry.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {entry.tags.map((tag, i) => (
-                <span key={i} className="tag-readonly">
+          {entry.tags?.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {entry.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="tag tag-selected"
+                >
                   {tag}
                 </span>
               ))}
             </div>
           )}
 
-          {entry.videoUrl && (
-            <div className="mt-4">
-              {embedUrl ? (
-                <iframe
-                  width="100%"
-                  height="315"
-                  src={embedUrl}
-                  title={`Video for ${entry.name}`}
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="rounded-xl shadow-md"
-                />
-              ) : (
-                <a
-                  href={entry.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-f3link underline"
-                >
-                  {entry.videoUrl}
-                </a>
-              )}
-            </div>
-          )}
-
-
-          {isAdmin && (
-            <div className="mt-4 text-xs text-gray-500 space-y-1">
-              <div><strong>ID:</strong> {entry.id}</div>
-              <div><strong>Slug:</strong> {slug}</div>
-              <div><strong>Type:</strong> {entry.type}</div>
-              <div><strong>Created:</strong> {new Date(entry.createdAt).toLocaleString()}</div>
-              <div><strong>Updated:</strong> {new Date(entry.updatedAt).toLocaleString()}</div>
-            </div>
-          )}
-        </>
+          {renderVideo()}
+        </div>
       )}
     </div>
   );
 }
-
-function renderDescriptionWithLinks(text: string) {
-  const parts = text.split(/(@[\w\-]+)/g); // only split on valid @mentions
-  return parts.map((part, i) => {
-    if (part.startsWith("@")) {
-      const refName = part.slice(1); // do NOT trim or include anything after
-      const refSlug = slugify(refName);
-      return (
-        <a key={i} href={`#${refSlug}`} className="text-f3link underline">
-          @{refName}
-        </a>
-      );
-    }
-    return <span key={i}>{part}</span>;
-  });
-}
-
-function escapeRegExp(text: string) {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function highlight(text: string, query: string) {
-  if (!query) return text;
-
-  const escapedQuery = escapeRegExp(query);
-
-  const regex = new RegExp(`(${escapedQuery})`, "gi");
-  const parts = text.split(regex);
-  return parts.map((part, i) =>
-    regex.test(part) ? (
-      <mark key={i} className="highlight-match">
-        {part}
-      </mark>
-    ) : (
-      part
-    )
-  );
-}
-
-const isYouTubeUrl = (url: string): boolean => {
-  if (url.includes("youtube.com/watch?v=")) {
-    return true;
-  }
-
-  return false;
-};
-
-const getYouTubeEmbedUrl = (url: string): string | null => {
-  if (isYouTubeUrl(url)) {
-    return url.replace("watch?v=", "embed/");
-  }
-
-  return null;
-};

@@ -6,10 +6,22 @@ import { Submission, SubmissionStatus } from "@prisma/client"
 import { redirect } from "next/navigation";
 
 export async function getSubmissions() {
-  return await prisma.submission.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  // If prisma or the submission delegate is undefined for some reason, return an empty array.
+  if (!prisma || !prisma.submission) {
+    console.error("Prisma or prisma.submission is undefined");
+    return [];
+  }
+
+  try {
+    return await prisma.submission.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (err) {
+    console.error("Error fetching submissions:", err);
+    return [];
+  }
 }
+
 
 export async function submitEntry(formData: FormData) {
   const type = formData.get("type");
@@ -149,4 +161,12 @@ export async function promoteSubmissionToXicon(submissionId: string) {
       },
     }),
   ]);
+}
+
+export async function deleteSubmission(submissionId: string) {
+  if (!submissionId) {
+    throw new Error("Missing submission ID");
+  }
+  // Delete the submission row
+  await prisma.submission.delete({ where: { id: submissionId } });
 }

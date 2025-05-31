@@ -6,7 +6,7 @@ import { deleteXicon } from "@/lib/xicon";
 import { XiconCard } from "./XiconCard";
 import { useToast } from "@/components/ToastProvider";
 import { slugify } from "@/lib/slugify";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import { XMarkIcon, ArrowDownTrayIcon } from "@heroicons/react/20/solid";
 
 interface Props {
   entries: Xicon[];
@@ -104,8 +104,57 @@ export default function XiconBrowser({
     );
   };
 
+  const exportCSV = (entries: Xicon[], filename: string) => {
+    const headers = [
+      "Name", "Description", "Aliases", "Tags",
+      "Type", "Video URL", "Submitted By", "Region"
+    ];
+  
+    const rows = entries.map((entry) => [
+      `"${entry.name.replace(/"/g, '""')}"`,
+      `"${entry.description.replace(/"/g, '""')}"`,
+      `"${entry.aliases.join(", ").replace(/"/g, '""')}"`,
+      `"${entry.tags.join(", ").replace(/"/g, '""')}"`,
+      entry.type,
+      entry.videoUrl ?? "",
+      entry.submittedBy ?? "",
+      entry.region ?? "",
+    ]);
+  
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+  
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  
+
   return (
     <div>
+      {isAdmin && (
+        <div className="flex justify-end gap-2 mb-4">
+          <button
+            onClick={() => exportCSV(localEntries, "xicons-all.csv")}
+            className="flex items-center gap-1 text-sm border border-gray-300 rounded px-3 py-1 hover:bg-gray-100"
+          >
+            <ArrowDownTrayIcon className="h-4 w-4" />
+            Export All to CSV
+          </button>
+          <button
+            onClick={() => exportCSV(filteredEntries, "xicons-filtered.csv")}
+            className="flex items-center gap-1 text-sm border border-gray-300 rounded px-3 py-1 hover:bg-gray-100"
+          >
+            <ArrowDownTrayIcon className="h-4 w-4" />
+            Export Filtered to CSV
+          </button>
+        </div>
+      )}
     <div className="mb-4">
       <div className="relative w-full">
         <input

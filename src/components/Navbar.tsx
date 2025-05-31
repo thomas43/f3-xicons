@@ -14,7 +14,7 @@ const navLinks = [
 export function Navbar() {
   return (
     <nav className="w-full bg-gray-100 border-b border-gray-300 p-4">
-      <div className="max-w-6xl mx-auto flex flex-wrap gap-4 text-sm font-medium">
+      <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-4 text-sm font-medium">
         {navLinks.map((link) => (
           <Link
             key={link.href}

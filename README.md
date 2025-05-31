@@ -71,7 +71,10 @@ $ npx prisma migrate reset
 ```bash
 $ npx prisma db push --force-reset
 ```
-
+7. `.env` needs to be 
+```
+DATABASE_URL="postgresql://USER:PASS@PUBLIC_IP:5432/f3xicons?sslmode=require"
+```
 
 ## Tailwind debugging
 

@@ -7,7 +7,7 @@ const { PrismaClient, XiconType } = require("@prisma/client");
 const { normalizeQuotes, parseReferences } = require("./utils");
 
 const prisma = new PrismaClient();
-const filePath = path.resolve(__dirname, "../../lexicon.csv");
+const filePath = path.resolve(__dirname, "../../seed-csv/00-lexicon.csv");
 
 async function importLexicon() {
   const records = [];

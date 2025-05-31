@@ -103,15 +103,18 @@ export async function rejectSubmission(submissionId: string) {
   return prisma.submission.findUnique({ where: { id: submissionId } });
 }
 
-
-export async function updateSubmission(id: string, data: Partial<Submission>) {
-  return prisma.submission.update({
-    where: { id },
-    data,
+export async function updateSubmission(data: Submission): Promise<Submission> {
+  return await prisma.submission.update({
+    where: { id: data.id },
+    data: {
+      name: data.name,
+      description: data.description,
+      aliases: data.aliases,
+      tags: data.tags,
+      videoUrl: data.videoUrl,
+      // (any other updatable fields here)
+    },
   });
-
-  return prisma.submission.findUnique({ where: { id: id } });
-
 }
 
 export async function promoteSubmissionToXicon(submissionId: string) {

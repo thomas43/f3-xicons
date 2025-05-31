@@ -41,6 +41,8 @@ export async function updateXicon(data: Xicon): Promise<Xicon> {
       aliases: data.aliases,
       tags: data.tags,
       videoUrl: data.videoUrl,
+      submittedBy: data.submittedBy,
+      region: data.region,
     },
   });
 }

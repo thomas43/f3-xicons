@@ -40,6 +40,8 @@ export function XiconCard({
     aliasesCsv: Array.isArray(entry.aliases) ? entry.aliases.join(", ") : "",
     tags: Array.isArray(entry.tags) ? entry.tags : [],
     videoUrl: entry.videoUrl ?? "",
+    submittedBy: entry.submittedBy ?? "",
+    region: entry.region ?? ""
   });
 
   const [availableTags, setAvailableTags] = useState<string[]>([]);
@@ -92,7 +94,10 @@ export function XiconCard({
         aliases: form.aliasesCsv
           .split(",")
           .map((a :string) => a.trim())
-          .filter(Boolean), });
+          .filter(Boolean), 
+          submittedBy: form.submittedBy.trim(),
+          region: form.region.trim(),
+        });
       
       toastSuccess("Saved!");
       setEditing(false);
@@ -198,6 +203,28 @@ export function XiconCard({
             className="w-full border border-gray-300 rounded px-3 py-2"
           />
 
+          <div>
+            <label className="block text-sm font-medium">Submitted By</label>
+            <input
+              type="text"
+              value={form.submittedBy}
+              onChange={(e) => setForm({ ...form, submittedBy: e.target.value })}
+              placeholder="Name or F3 Handle"
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Region</label>
+            <input
+              type="text"
+              value={form.region}
+              onChange={(e) => setForm({ ...form, region: e.target.value })}
+              placeholder="F3 Region"
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            />
+          </div>
+
           <div className="flex gap-2 justify-end">
             <button
               onClick={handleSave}
@@ -258,6 +285,18 @@ export function XiconCard({
           )}
 
           {renderVideo()}
+
+          {entry.submittedBy && (
+            <p className="text-xs text-gray-500 mt-2">
+              <strong>Submitted By:</strong> {entry.submittedBy}
+            </p>
+          )}
+          
+          {entry.region && (
+            <p className="text-xs text-gray-500 mt-1">
+              <strong>Region:</strong> {entry.region}
+            </p>
+          )}
         </div>
       )}
     </div>

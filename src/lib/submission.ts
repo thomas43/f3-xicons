@@ -30,6 +30,10 @@ export async function submitEntry(formData: FormData) {
   const aliasesRaw = formData.get("aliases")?.toString();
   const tagsRaw = formData.get("tags")?.toString();
   const videoUrlRaw = formData.get("videoUrl")?.toString();
+  const submittedBy = formData.get("submittedBy")?.toString();
+  const region = formData.get("region")?.toString();
+  const contactEmail = formData.get("contactEmail")?.toString();
+
 
   if (!type || !name || !description) {
     throw new Error("Missing required fields.");
@@ -54,6 +58,9 @@ export async function submitEntry(formData: FormData) {
       tags,
       videoUrl,
       status: SubmissionStatus.pending,
+      submittedBy,
+      region,
+      contactEmail,
     },
   });
 
@@ -112,7 +119,9 @@ export async function updateSubmission(data: Submission): Promise<Submission> {
       aliases: data.aliases,
       tags: data.tags,
       videoUrl: data.videoUrl,
-      // (any other updatable fields here)
+      submittedBy: data.submittedBy,
+      region: data.region,
+      contactEmail: data.contactEmail,
     },
   });
 }
@@ -131,6 +140,8 @@ export async function promoteSubmissionToXicon(submissionId: string) {
     tags,
     videoUrl,
     type,
+    submittedBy,
+    region,
   } = submission;
 
   const existing = await prisma.xicon.findFirst({
@@ -161,6 +172,8 @@ export async function promoteSubmissionToXicon(submissionId: string) {
         tags,
         videoUrl,
         type,
+        submittedBy,
+        region,
       },
     }),
   ]);

@@ -47,6 +47,8 @@ async function importLexicon() {
           aliases: [],
           tags: [],
           videoUrl: null,
+          submittedBy: "",
+          region: "",
         },
       });
 

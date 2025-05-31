@@ -106,7 +106,12 @@ export default function SubmissionForm() {
 
       <div>
         <label className="block text-sm font-medium">Name</label>
-        <input name="name" type="text" className="w-full border p-2 rounded" required />
+        <input 
+          name="name" 
+          type="text" 
+          className="w-full border p-2 rounded" 
+          placeholder="Required"
+          required />
       </div>
 
       <div>
@@ -120,7 +125,11 @@ export default function SubmissionForm() {
 
       <div>
         <label className="block text-sm font-medium">Aliases (comma-separated)</label>
-        <input name="aliases" type="text" className="w-full border p-2 rounded" />
+        <input 
+          name="aliases" 
+          type="text" 
+          className="w-full border p-2 rounded" 
+          placeholder="Optional"/>
       </div>
 
       <div>
@@ -131,9 +140,40 @@ export default function SubmissionForm() {
 
       <div>
         <label className="block text-sm font-medium">Video URL</label>
-        <input name="videoUrl" type="url" className="w-full border p-2 rounded" />
+        <input 
+          name="videoUrl" 
+          type="url" 
+          className="w-full border p-2 rounded"
+          placeholder="Optional" />
       </div>
 
+      <div>
+        <label className="block text-sm font-medium">Submitted By</label>
+        <input 
+          name="submittedBy" 
+          type="text" 
+          className="w-full border p-2 rounded" 
+          placeholder="Optional"/>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">F3 Region</label>
+        <input 
+          name="region" 
+          type="text" 
+          className="w-full border p-2 rounded" 
+          placeholder="Optional"/>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">Contact Email</label>
+        <input 
+          name="contactEmail" 
+          type="email" 
+          className="w-full border p-2 rounded"
+          placeholder="Optional" />
+      </div>
+      
       <button
         type="submit"
         className="bg-f3accent text-white py-2 px-4 rounded"

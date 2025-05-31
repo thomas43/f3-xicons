@@ -52,6 +52,8 @@ async function importExicon() {
           aliases: [],
           tags,
           videoUrl: null,
+          submittedBy: "",
+          region: "",
         },
       });
 

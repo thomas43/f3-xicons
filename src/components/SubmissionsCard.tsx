@@ -31,6 +31,9 @@ export default function SubmissionsCard({
     aliasesCsv: string;
     tags: string[];
     videoUrl: string;
+    submittedBy: string;
+    region: string;
+    contactEmail: string;
   }>({
     name: submission.name ?? "",
     description: submission.description ?? "",
@@ -39,7 +42,11 @@ export default function SubmissionsCard({
       : "",
     tags: Array.isArray(submission.tags) ? submission.tags : [],
     videoUrl: submission.videoUrl ?? "",
+    submittedBy: submission.submittedBy ?? "",
+    region: submission.region ?? "",
+    contactEmail: submission.contactEmail ?? "",
   });
+  
 
   const [mentionData, setMentionData] = useState<
     { id: string; display: string }[]
@@ -150,6 +157,12 @@ export default function SubmissionsCard({
     setForm((prev) => ({ ...prev, tags: newTags }));
   const handleVideoUrlChange = (newUrl: string) =>
     setForm((prev) => ({ ...prev, videoUrl: newUrl }));
+  const handleSubmittedByChange = (val: string) =>
+    setForm((prev) => ({ ...prev, submittedBy: val }));
+  const handleRegionChange = (val: string) =>
+    setForm((prev) => ({ ...prev, region: val }));
+  const handleContactEmailChange = (val: string) =>
+    setForm((prev) => ({ ...prev, contactEmail: val }));
 
   const handleSave = async () => {
     // 1) Validate required fields
@@ -176,6 +189,9 @@ export default function SubmissionsCard({
       aliases: aliasesArray,
       tags: form.tags.map((t) => t.trim()).filter(Boolean),
       videoUrl: form.videoUrl.trim() || null,
+      submittedBy: form.submittedBy.trim() || "",
+      region: form.region.trim() || "",
+      contactEmail: form.contactEmail.trim() || "",
     };
 
     try {
@@ -273,6 +289,9 @@ export default function SubmissionsCard({
                     ? submission.tags
                     : [],
                   videoUrl: submission.videoUrl ?? "",
+                  submittedBy: submission.submittedBy ?? "",
+                  region: submission.region ?? "",
+                  contactEmail: submission.contactEmail ?? "",
                 });
                 setEditing(false);
               }}
@@ -317,7 +336,7 @@ export default function SubmissionsCard({
               value={form.aliasesCsv}
               onChange={(e) => handleAliasesCsvChange(e.target.value)}
               className="mt-1 block w-full border px-2 py-1 rounded text-sm"
-              placeholder="e.g. Foo, Bar, Baz"
+              placeholder="e.g. Burpee, Merkin, etc"
             />
           </div>
 
@@ -339,6 +358,39 @@ export default function SubmissionsCard({
               onChange={(e) => handleVideoUrlChange(e.target.value)}
               className="mt-1 block w-full border px-2 py-1 rounded text-sm"
               placeholder="https://example.com/video"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Submitted By</label>
+            <input
+              type="text"
+              value={form.submittedBy}
+              onChange={(e) => handleSubmittedByChange(e.target.value)}
+              className="mt-1 block w-full border px-2 py-1 rounded text-sm"
+              placeholder="Name or F3 Handle"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Region</label>
+            <input
+              type="text"
+              value={form.region}
+              onChange={(e) => handleRegionChange(e.target.value)}
+              className="mt-1 block w-full border px-2 py-1 rounded text-sm"
+              placeholder="Region"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Contact Email</label>
+            <input
+              type="email"
+              value={form.contactEmail}
+              onChange={(e) => handleContactEmailChange(e.target.value)}
+              className="mt-1 block w-full border px-2 py-1 rounded text-sm"
+              placeholder="Optional"
             />
           </div>
 

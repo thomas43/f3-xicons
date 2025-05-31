@@ -24,7 +24,7 @@ export default async function LexiconPage() {
     
       <XiconBrowser 
         entries={entries} 
-        enableTags={true} 
+        enableTags={false} 
         searchPlaceholder="Search lexicon terms..."
         isAdmin={false}
         showTypeFilter={false}

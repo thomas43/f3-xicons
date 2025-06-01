@@ -10,6 +10,7 @@ import {
   TrashIcon,
   CheckIcon,
   XMarkIcon,
+  SpinnerIcon,
 } from "@heroicons/react/20/solid";
 
 import { TagInput } from "@/components/TagInput";
@@ -47,6 +48,8 @@ export function XiconCard({
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [mentionData, setMentionData] = useState<{ id: string; display: string }[]>([]);
   const fetchedTags = useRef(false);
+
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const startEditing = async () => {
     setEditing(true);
@@ -123,36 +126,76 @@ export function XiconCard({
     });
   }
   
+  const getYouTubeEmbedUrl = (url: string): string | null => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
+  const getYouTubeVideoId = (url: string): string | null => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+    return match ? match[1] : null;
+  };
+  
 
   const renderVideo = () => {
+    const videoId = getYouTubeVideoId(form.videoUrl ?? "");
+    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  
     if (!form.videoUrl) return null;
-    const embedUrl = getYouTubeEmbedUrl(form.videoUrl);
+  
     if (!embedUrl) {
       return (
         <a
           href={form.videoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-f3accent underline"
+          className="text-f3accent underline mt-4 block"
         >
           {form.videoUrl}
         </a>
       );
     }
+  
     return (
-      <iframe
-        className="w-full h-64 mb-4"
-        src={embedUrl}
-        title="Xicon video"
-        allowFullScreen
-      />
+      <div className="mt-4 mb-4 flex justify-center">
+        <div className="relative aspect-video w-full max-w-md rounded overflow-hidden shadow">
+          {isPlaying ? (
+            <iframe
+              className="w-full h-full"
+              src={`${embedUrl}?autoplay=1`}
+              title="Xicon video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div
+              className="w-full h-full bg-black cursor-pointer group relative"
+              onClick={() => setIsPlaying(true)}
+            >
+              <img
+                src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                alt="Video thumbnail"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-white/60 rounded-full p-3 group-hover:scale-110 transition-transform shadow-lg">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-white"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M6.5 5.5v9l7-4.5-7-4.5z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     );
   };
-
-  const getYouTubeEmbedUrl = (url: string): string | null => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
-    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
-  };
+  
 
   return (
     <div className="border border-gray-300 rounded p-4 mb-4 bg-white shadow-md">

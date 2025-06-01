@@ -1,0 +1,97 @@
+There's a lot of info on the main page (https://f3-xicons-2.fly.dev/) and in the Readme, but I'll try to summarize here. 
+
+Tech Stack is Next.js + React + Postgres (GCP Cloud SQL) + Tailwind
+Hosted on Fly.io and easy to deploy to GCP. Cloud SQL is on GCP.
+
+Data - started with your .csv and manually edited most of the entries from the youtube @f3vexicon. Btw did you know that "merkin" wasn't in your original CSV. I added it ;)
+
+Some considerations; 
+1. The fly instances have to start up if you route to the page for the first time and the machine is offline. Similar to Vercel. One the machine is up, should be good to go. Would be better performing on GCP.
+2. I use a lot of client-side rendering. I'm not sure if this is the best way to handle this type of dataset. All of the research I did supported client-side for anything that's a smaller dataset (which this should be)
+3. There is no authentication but it would be easy to pass to all the components since I have 'isAdmin' hooks.
+4. I used tailwind due to many recommendations. (not a web dev by trade ;)). I think it makes a nice UI but it's kind of clunky to work with. If I were to do this again, I would probably consider some basic css.
+
+On every page: 
+ - There's a navbar, just to move around. Easy to use or remove if needed. 
+ - There's an Up Arrow button (bottom-right) which will take you to the top of the page
+ - There's a Toast system to toast notifications (top-right)
+
+/exicon Page
+ - No Auth read-only Exicons. Populates XiconBrowser & N- XiconCard components.
+ - Filtering by tags (clickable)
+ - Filtering supports AND/OR
+ - Videos will play if pressed. 
+ - Search bar
+
+/lexicon Page
+ - No Auth read-only Lexicons. Populates XiconBrowser & N- XiconCard components
+ - No tags (but could be easily added, there's a simple boolean)
+ - Search bar
+
+/submit Page
+ - No auth submit a 'Xicon', either or. Required fields are noted. Others are optional.
+
+/admin Page
+ - No authentication but my idea here was this is where you'd use your next-auth stuff to authenticate. Ideally an admin login page, and would show you your permissioned routes.
+
+/admin/submissions
+ - Where an admin could edit/delete/approve/reject/pending submissions. Uses SubmissionState (approved/pending/rejected). 
+ - Has easy buttons to set state and do all options. 
+ - 'Approve' auto-creates a Xicon entry.
+
+/admin/xicon
+ - Where an admin could edit/delte Xicon entries. 
+ - Supports filtering of exicon/lexicon as well as all tags
+ - CSV export, either the 'all' or the current filter
+ - Simple edit ui (just click the pen)
+
+ The main flow of this program is User submits via /submit, admin looks at /admin/subissions and decides what to do. If admin needs to edit submission he can on /admin/submissions or 'Approve' and then edit on /admin/xicon
+
+
+
+Database (see schema.prisma):
+
+model Xicon {
+  id          String   @id @default(cuid())
+  type        XiconType
+  name        String   @db.Text
+  description String   @db.Text
+  aliases     String[] @default([])
+  tags        String[] @default([]) // Only used for Exicon
+  videoUrl    String?  @db.Text     // Only used for Exicon
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  submittedBy String   @db.Text
+  region      String   @db.Text
+
+  @@unique([name,type])
+}
+
+model Submission {
+  id          String   @id @default(cuid())
+  type        XiconType
+  name        String
+  description String
+  aliases     String[] @default([])
+  tags        String[] @default([])
+  videoUrl    String?  @db.Text
+  status      SubmissionStatus  @default(pending) // or use enum: pending, approved, rejected
+  createdAt   DateTime @default(now())
+  submittedBy String   @db.Text
+  region      String   @db.Text
+  contactEmail  String?
+}
+
+enum SubmissionStatus {
+  pending
+  approved
+  rejected
+}
+
+enum XiconType {
+  exicon
+  lexicon
+}
+
+
+Exicons and Lexicons are handled by one object and an enum value. I did this on purpose because of the dataset. It would be easy to make these their own tables if needed.

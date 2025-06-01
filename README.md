@@ -25,12 +25,23 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 Review the [f3_xicon hackathon doc](xicon_hackathon.md)
 
+## Cleaning/Reseeding the DB (not recommended for prod...but it's fine...)
+1. Delete the old data
+```bash
+$ npx ts-node prisma/seed/delete-xicon.ts
+```
+
+2. Import last-known best CSV
+```bash
+$ npx ts-node prisma/seed/import-xicons.ts
+```
+
 ## Prisma commands
 
 1. Importing seed data (should fix UTF-8 encoding weirdness)
 ```bash
-$ npx ts-node prisma/seed/import-exicon.ts`
-$ npx ts-node prisma/seed/import-lexicon.ts`
+$ npx ts-node prisma/seed/import-exicon.ts
+$ npx ts-node prisma/seed/import-lexicon.ts
 ```
 
 2. Fix UTF-8 encoding (if needed)

@@ -6,7 +6,7 @@ const { parse } = require("csv-parse");
 const { PrismaClient, XiconType } = require("@prisma/client");
 
 const prisma = new PrismaClient();
-const filePath = path.resolve(__dirname, "../../seed-csv/00-xicons-all.csv"); 
+const filePath = path.resolve(__dirname, "../../seed-csv/02-xicons-all-f3vexicon-vids-xicons-all-save.csv"); 
 
 function parseCSVField(field) {
   return field?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];

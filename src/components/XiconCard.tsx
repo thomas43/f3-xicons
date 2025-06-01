@@ -195,6 +195,8 @@ export function XiconCard({
             <input type="hidden" name="tags" value={form.tags.join(",")} />
           </div>
 
+          <div>
+          <label className="block text-sm font-medium">YouTube video URL</label>
           <input
             type="text"
             value={form.videoUrl}
@@ -202,6 +204,7 @@ export function XiconCard({
             placeholder="YouTube video URL"
             className="w-full border border-gray-300 rounded px-3 py-2"
           />
+          </div>
 
           <div>
             <label className="block text-sm font-medium">Submitted By</label>
